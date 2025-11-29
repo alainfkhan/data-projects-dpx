@@ -17,62 +17,33 @@ https://cookiecutter-data-science.drivendata.org/#directory-structure
 ====================================================================================================
 ====================================================================================================
 
-NB:
-playground/: data project dump
-projects/: official attempt
-
-Progress cannot be transferred from playground/ to projects/. Would need a new init.
 
 ====================================================================================================
 ====================================================================================================
 
-project/
+dpx/
     data/
-        raw/
-        interim/
-        processed/
-        external/
+    docs/
+    src/
+        dpx/
+            __init__.py
+            __main__.py
+            dpx_launcher.py
+            cli/
+                docs/
+                __init__.py
+                create.py
+                read.py
+                update.py
+                delete.py
+                util.py
 
-    
-
-data-projects/
-├── data/
-├── docs/
-├── playground/                 # same layout as projects/
-│   └── ... 
-│
-├── projects/
-│   ├── smith-somedataset/
-│   │   ├── data/
-│   │   │   ├── external/
-│   │   │   ├── interim/
-│   │   │   ├── processed/
-│   │   │   └── raw/
-│   │   │
-│   │   ├── README.md
-│   │   ├── someproject.ipynb
-│   │   └── sources.txt
-│   │
-│   ├── doe-anotherdataset/
-│   │   └── ...
-│   │
-│   ├── .../
-│   │
-│   └── __init__.py 
-│
-├── src/
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── paths.py
-│   │   └── util.py
-│   │
-│   ├── __init__.py
-│   ├── __main__.py
-│   └── dps_launcher.py
-│
-├── .gitignore
-├── LICENSE
-├── Makefile 
-├── package-list.txt
-├── README.md
-└── setup.py
+            utils/
+                __init__.py
+                paths.py
+                util.py
+            
+    tests/
+    .gitignore
+    Makefile
+    README.md

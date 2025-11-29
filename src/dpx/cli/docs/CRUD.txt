@@ -23,8 +23,8 @@ Flag definitions:
     -f, --force             force
     -dbn                    database name
     -dfn, --data-filename   data filename
-    -dir                    general for directory
-    -dirs                   expects a list
+    -ddir                    general for directory
+    -ddirs                   expects a list
     -ide                    ide
     --save-to               m or p
     --new-name              depending on context
