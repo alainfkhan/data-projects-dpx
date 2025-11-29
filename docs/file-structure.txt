@@ -1,0 +1,78 @@
+====================================================================================================
+====================================================================================================
+
+Special characters:
+├──
+│
+└──
+│   ├──
+│   └──
+│   │   ├──
+
+Ideal project file structure:
+Add files when necessary.
+The file structure is a loose adaptation from Cookiecutter Data Science:
+https://cookiecutter-data-science.drivendata.org/#directory-structure
+
+====================================================================================================
+====================================================================================================
+
+NB:
+playground/: data project dump
+projects/: official attempt
+
+Progress cannot be transferred from playground/ to projects/. Would need a new init.
+
+====================================================================================================
+====================================================================================================
+
+project/
+    data/
+        raw/
+        interim/
+        processed/
+        external/
+
+    
+
+data-projects/
+├── data/
+├── docs/
+├── playground/                 # same layout as projects/
+│   └── ... 
+│
+├── projects/
+│   ├── smith-somedataset/
+│   │   ├── data/
+│   │   │   ├── external/
+│   │   │   ├── interim/
+│   │   │   ├── processed/
+│   │   │   └── raw/
+│   │   │
+│   │   ├── README.md
+│   │   ├── someproject.ipynb
+│   │   └── sources.txt
+│   │
+│   ├── doe-anotherdataset/
+│   │   └── ...
+│   │
+│   ├── .../
+│   │
+│   └── __init__.py 
+│
+├── src/
+│   ├── utils/
+│   │   ├── __init__.py
+│   │   ├── paths.py
+│   │   └── util.py
+│   │
+│   ├── __init__.py
+│   ├── __main__.py
+│   └── dps_launcher.py
+│
+├── .gitignore
+├── LICENSE
+├── Makefile 
+├── package-list.txt
+├── README.md
+└── setup.py

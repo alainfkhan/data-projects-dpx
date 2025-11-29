@@ -1,0 +1,208 @@
+Definitions:
+<project_name>  user input variable called project_name
+<datafile>      data file name
+user            the person doing the analysis
+name            the name of the project
+d prefix        any data file
+
+Fixed:
+main and playground
+data directories, exactly 4
+
+Variable:
+data dir names r,i,p,e
+
+
+Flag definitions: 
+    -n, --name              project name
+    -p, --playground        toggle for playground directory
+    -all                    choose both main/ and playground/
+    -t, --temps             temporary files
+    -nt, --non-temps        non-temporary files
+    --all-temps             --all and -t
+    -f, --force             force
+    -dbn                    database name
+    -dfn, --data-filename   data filename
+    -dir                    general for directory
+    -dirs                   expects a list
+    -ide                    ide
+    --save-to               m or p
+    --new-name              depending on context
+    --keep-name             keep same name when copied
+    -ca, --copy-attachment  "-copy" by default
+
+
+This is a list of cli commands segregated in CRUD
+CRUD commands will be ordered appropriately in __main__.py
+
+
+
+===================================================
+Create commands:
+===================================================
+init
+    initialise a workspace
+    classify kaggle urls
+    recognise download urls
+
+    dps init -u=<url> <name> 
+    dps init <name>
+    
+    dps init
+        creates a temporary project name
+
+dl
+    donwload a dataset to project
+    always in project/data/raw
+
+    dps dl -u=<url> <name>
+
+cdb
+    create a database with tables in raw
+    always table from 
+    dbn default project name
+
+    dps cdb <name> -dbn=<db_name> 
+    dps cdb <name> 
+
+dpromote
+    data promote
+    copies files from one data dir to another
+
+    r -> i add -copy
+    i -> p same name
+
+    dps dpromote <name> -dir=r -ca=""
+    dps dpromote <name> -p -dir=i
+
+
+
+
+
+===================================================
+Read commands
+===================================================
+ls
+    list projects in main/ or playground/
+    default show main/ without temps
+
+    dps ls
+    dps ls -p
+    dps ls --all
+    dps ls -t -p
+
+dls
+    data ls
+    list data filenames
+    table of data file names in raw, interim, procesed, exteral
+    dirs="prei" data of cols p,r,e,i
+
+    dps dls <name>
+    dps dls <name> --all
+    dps dls <name> -dir=raw
+    dps dls <name> -dir=r
+    dps dls <name> -dirs=pei
+
+
+head
+    show content of data file
+
+    dps head <name> -r <datafile> 
+    dps head <name> -f <datafile> 
+
+
+
+
+===================================================
+Update commands
+===================================================
+rename
+    rename project and all non-data files with the same project name
+
+    dps rename <name> <new_name>
+
+drename
+    rename a data file
+    dir required
+
+    dps drename -n=<name> -dir=i <datafile> <new_datafile>
+    dps drename <datafile> <new_datafile> -n=<name> -p -dir=i
+
+uds
+    dev tool
+    update structure
+    update filestructure
+
+    dps uds --all 
+
+
+promote
+    move a project from playground/ to main/
+
+    dps promote <name>
+
+
+demote
+    move a project from main/ to playground/
+
+    dps demote <name>
+
+mv
+    if project in main/ move to playground/ else vice versa
+
+    dps mv <name>
+
+===================================================
+Delete commands
+===================================================
+rm
+    delete a project in main/ or playground/ if -p
+
+    dps rm <name>
+    dps rm <name> -p
+    dps rm -t
+        removes all temp files in main/
+    
+    dps rm -t -p
+        removes all temp files in playground/
+
+    dps rm --all-temps
+        removes all temp files in both main/ and playground/
+
+drm
+    data remove
+    delete data files
+    -dir necessary
+    -f necessary for whole folder wipe
+
+    dps drm -dir=raw -dn=<datafile> <name>
+    dps drm -dir=r --all -f <name>
+
+
+
+===================================================
+Other
+===================================================
+begin
+    open ide on path/to/project
+    default ide=code
+
+    dps begin <name>
+    dps begin -ide=code <name>
+
+open
+    open excel file from terminal
+    
+    dps open <name> -dn=<datafile> -dir=i
+
+
+
+
+
+
+
+
+
+
+
+

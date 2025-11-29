@@ -1,0 +1,54 @@
+CLI tool name: dps
+
+
+Stack:
+python
+excel
+sqlite/sqlalchemy
+tableau
+
+Ideal project structure:
+projects/ or playground/
+    <project_name>/
+        data/
+            raw/            <- original data dump, after import ignore 
+            interim/        <- data space for cleaning
+            processed/      <- final data
+            external/       <- metadata
+            db/             <- database folder of tables in raw
+        docs/
+            assets/         <- image storage for README.md
+            sources.txt     <- url references
+        reports/            <- dashboards
+        notebooks/
+            <project_name>.ipynb    <- general notebook
+        README.md                   <- for github
+
+NB: <project_name> and <project_name>.ipynb have the same project name
+
+
+General notes:
+Want to change dir:
+
+base_dir/
+    .git
+    projects/
+    playground/
+    src/
+
+to
+
+data-portfolio/
+    .git
+    projects/
+        main/
+        playground/
+
+base_dir/
+    .git
+    src/
+
+since a project in playground/ is called a project despite not being in project/
+
+Want to move project/ to another base_dir
+For this project, allow data projects to exist inside base_dir

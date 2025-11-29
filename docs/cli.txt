@@ -1,0 +1,78 @@
+Definitions:
+Data directories:
+    someproject/data/
+        raw/
+        interim/
+        processed/
+        external/
+
+
+Say John Smith has a dataset 'somedataset',
+the project name would be: smith-somedataset.
+Or if the dataset is called 'some-long-name-dataset-analysing-imdb'
+call the project name: 'smith-imdb'.
+The dataset 'somedataset' contains:
+    somefile.csv
+    somefiletwo.csv
+    anotherfile.xlsx
+    randomfile.docx
+
+someproject = smith-somedataset
+
+
+==================================================
+dps init someproject
+==================================================
+Creates:
+    'someproject' project directory: projects/someproject/
+    data directories inside this project directory: proejcts/someproject/data/raw, ...
+    someproject.ipynb
+    sources.txt
+    README.md
+
+NB: there is no data to make a db on
+
+
+==================================================
+dps ls
+dps ls -p
+==================================================
+
+==================================================
+dps rm someproject anotherproject
+dps rm some project anotherproject -p
+==================================================
+
+==================================================
+dps copy-files -n someproject
+==================================================
+Copies files from someproject/data/raw to someproject/data/interim
+renaming files from 'somefile.ext' to 'somefile-copy.ext
+
+
+==================================================
+dps create-db -n someproject 
+dps create-db -n someproject --files somefile.csv somefiletwo.csv anotherfile.xlsx 
+==================================================
+Creates a sqlite db to someproject/data/external of data in someproject/data/raw
+
+
+==================================================
+dps download kaggle --url https://www.kaggle.com/datasets/johnsmith/somedataset/data -n smith-somedataset
+==================================================
+Downloads the kaggle dataset using the api to project folder smith-somedataset
+
+
+==================================================
+dps init-kaggle --url https://www.kaggle.com/datasets/johnsmith/somedataset/data -n smith-somedataset
+==================================================
+Calls:
+    PROJNAME='smith-somedataset'
+    KAGGLEURL='https://www.kaggle.com/datasets/johnsmith/somedataset/data'
+
+    dps init -n $PROJNAME
+    dps download kaggle --url $KAGGLEURL -n $PROJNAME 
+    dps copy-files -n $PROJNAME
+    dps create-db -n $PROJNAME
+
+
