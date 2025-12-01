@@ -77,5 +77,3 @@ def df_to_table(df: DataFrame) -> Table:
         table.add_row(*row_list)
 
     return table
-
-    

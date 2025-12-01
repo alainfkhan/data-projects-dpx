@@ -1,5 +1,7 @@
 """Delete CLI commands.
 
+TODO: rm moves a project to trash, until deletion some days later
+
 rm
 """
 
@@ -11,8 +13,11 @@ app = typer.Typer()
 
 @app.command()
 def rm(
-    project_names: Annotated[list[str], typer.Argument()],
-    playground: Annotated[bool, typer.Option()],
-    temps: Annotated[bool, typer.Option()],
+    names: Annotated[list[str], typer.Argument()],
+    group: Annotated[str, typer.Option()] = "main",
+    playground: Annotated[bool, typer.Option()] = False,
+    temps: Annotated[bool, typer.Option()] = False,
+    all_temps: Annotated[bool, typer.Option()] = False,
 ) -> None:
+    """Delete projects."""
     pass
