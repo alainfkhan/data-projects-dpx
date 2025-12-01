@@ -21,7 +21,7 @@ DPX_DIR = Path(__file__).parent.parent.parent.parent
 
 DP_DIR = DPX_DIR.parent
 
-PROJECTS_DIR = DP_DIR / "dp_projects"
+PROJECTS_DIR = DP_DIR / "dp-projects"
 
 MAIN_DIR = PROJECTS_DIR / "main"
 PLAYGROUND_DIR = PROJECTS_DIR / "playground"

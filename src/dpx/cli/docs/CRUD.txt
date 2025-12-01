@@ -16,25 +16,28 @@ data dir names r,i,p,e
 Flag definitions: 
     -n, --name              project name
     -p, --playground        toggle for playground directory
-    -all                    choose both main/ and playground/
+    -all                    choose all project dirs: main/ and playground/ and ...
     -t, --temps             temporary files
     -nt, --non-temps        non-temporary files
     --all-temps             --all and -t
     -f, --force             force
     -dbn                    database name
     -dfn, --data-filename   data filename
-    -ddir                    general for directory
-    -ddirs                   expects a list
+    -ddir                   general for directory
+    -ddirs                  expects a list
     -ide                    ide
-    --save-to               m or p
+    --save-to               save to project dir
     --new-name              depending on context
     --keep-name             keep same name when copied
-    -ca, --copy-attachment  "-copy" by default
+    -ca, --copy-attachment  "-copy" by default (dev)
 
 
 This is a list of cli commands segregated in CRUD
 CRUD commands will be ordered appropriately in __main__.py
 
+Variable names:
+home: the chosen project directory
+    main/ or projects/
 
 
 ===================================================
@@ -148,9 +151,8 @@ demote
     dps demote <name>
 
 mv
-    if project in main/ move to playground/ else vice versa
-
-    dps mv <name>
+    move a project from one project dir to another
+    dps mv <project_dir>/<name> <new_project_dir>/<new_name>
 
 ===================================================
 Delete commands

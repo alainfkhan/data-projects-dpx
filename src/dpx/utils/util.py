@@ -1,4 +1,6 @@
-"""Utility functions for CLI."""
+"""General purpose util functions not specific to the CLI app.
+Config vars goes here
+"""
 
 import string
 import random
@@ -9,10 +11,13 @@ from pandas import DataFrame, Series
 from pathlib import Path
 from rich.table import Table
 
-from src.dpx.utils.paths import PROJECTS_DIR
+from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
 
 """Configuration variables"""
+
+# temporary file prefix
 temp_prefix = "~"
+
 copy_attachment = "-copy"
 random_string_length = 6
 data_folder_names: list[str] = [
@@ -58,17 +63,19 @@ def random_string(length: int = random_string_length) -> str:
 #     pass
 
 
-# def df_to_table(df: DataFrame) -> Table:
-#     """Pandas dataframe to rich table"""
+def df_to_table(df: DataFrame) -> Table:
+    """Pandas dataframe to rich table"""
 
-#     col_names: list[str] = list(df.columns)
-#     table = Table()
+    col_names: list[str] = list(df.columns)
+    table = Table()
 
-#     for col in col_names:
-#         table.add_column(col)
+    for col in col_names:
+        table.add_column(col)
 
-#     for row_tuple in df.itertuples(index=False):
-#         row_list = [str(x) for x in row_tuple]
-#         table.add_row(*row_list)
+    for row_tuple in df.itertuples(index=False):
+        row_list = [str(x) for x in row_tuple]
+        table.add_row(*row_list)
 
-#     return table
+    return table
+
+    
