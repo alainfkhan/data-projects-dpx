@@ -15,13 +15,7 @@ from icecream import ic
 from rich import print
 from typing_extensions import Annotated
 
-from src.dpx.cli.util import (
-    verify_project,
-    list_projects,
-    list_all_projects,
-    verify_group,
-    can_create_project,
-)
+from src.dpx.cli.util import ProjectsManager
 from src.dpx.utils.util import temp_prefix, copy_attachment, random_string
 from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
 
@@ -34,6 +28,7 @@ base_ddir = "r"
 default_doption = "ripe"
 
 app = typer.Typer()
+pm = ProjectsManager()
 
 
 # @app.command(help="Download a dataset to a project.")
@@ -63,7 +58,7 @@ app = typer.Typer()
 #     pass
 
 
-@app.command(help="Initialise a workspace.")
+@app.command(help="Initialise a project workspace in an existing project group.")
 def init(
     name: Annotated[str, typer.Argument(help="Name of project.")] = temp_prefix
     + random_string(),
@@ -87,17 +82,25 @@ def init(
     dpx init smith-somedataset
         Initialise a workspace called 'smith-somedataset' in the main group.
 
-    dpx init smith-somedataset -url
-
+    dpx init smith-somedataset -url <url> -g <group>
+        Initialise a project called 'smith-somedataset' with data downloaded from <url>
+        in group <group>
     """
-    verify_group(group)
-    if not can_create_project(name):
+
+    pm.verify_group(group)
+    if not pm.can_create_project(name):
         raise ValueError(f"Project '{name}' cannot be created.")
 
     if playground:
         group = "playground"
 
     this_project_path = PROJECTS_DIR / group / name
+    this_project_path.mkdir()
 
-    # this_project_path.mkdir()
-    print(f"Initialised project: '{name}' in group: '{group}'.")
+    # make data folders
+    # make init folders
+
+    # if url valid download to data/raw
+    # add url to sources.txt
+
+    print(f"Initialised new project: '{name}' in group: '{group}'.")

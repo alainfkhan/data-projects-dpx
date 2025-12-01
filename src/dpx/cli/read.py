@@ -9,17 +9,18 @@ open
 """
 
 import os
+from collections.abc import Callable
 from pathlib import Path
 from typing_extensions import Annotated
-from collections.abc import Callable
 
 import typer
 import pandas as pd
 from icecream import ic
 from rich import print
 from rich.console import Console
+from rich.table import Table
 
-from src.dpx.cli.util import list_projects, verify_group, list_groups
+from src.dpx.cli.util import ProjectsManager
 from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import df_to_table, temp_prefix
 
@@ -28,22 +29,28 @@ ide = "code"
 ides = ["code", "vim"]
 
 app = typer.Typer()
+pm = ProjectsManager()
 
 
-@app.command(help="List project names.")
+@app.command(help="List projects.")
 def ls(
     groups: Annotated[list[str], typer.Argument(help="Choose the project groups.")] = [
         "main"
     ],
     playground: Annotated[
-        bool, typer.Option("-p", "--playground", help="Choose the playground group.")
+        bool,
+        typer.Option(
+            "-p", "--playground", help="List projects in the playground group."
+        ),
     ] = False,
     show_all: Annotated[
-        bool, typer.Option("--all", help="List projects from all project groups.")
+        bool,
+        typer.Option("--all", help="List projects from all project groups."),
     ] = False,
-    show_temps: Annotated[
+    temps: Annotated[
         bool, typer.Option("-t", "--temps", help="List temporary projects.")
     ] = False,
+    show_all_temps: Annotated[bool, typer.Option("--all-temps")] = False,
 ) -> None:
     """List project names from a project group.
 
@@ -57,42 +64,50 @@ def ls(
         List all projects including temps from the main group.
         Similar to ls -a
 
-    dpx ls --all
+    dpx ls --all-groups
         List all non-temp projects from all project groups.
 
     dpx ls portfolio main playground
         List all non-temp projects from groups: portfolio, main, and playground.
     """
 
+    for group in groups:
+        pm.verify_group(group)
+
     if playground:
         groups = ["playground"]
 
-    for group in groups:
-        verify_group(group)
+    if show_all_temps:
+        show_all = True
+        temps = True
 
     if show_all:
-        diff = set(list_groups())
+        diff = set(pm.groups)
         diff.remove("main")
         diff.remove("playground")
+        diff.remove(".trash")
 
-        groups = ["main", "playground", *diff]
+        groups = ["main", "playground", *diff, ".trash"]
 
     df = pd.DataFrame()
 
     for group in groups:
-        projects = list_projects(group)
+        projects = pm.list_projects_OLD(group)
         non_temp_projects = [
-            project for project in projects if not project.startswith(temp_prefix)
+            project
+            for project in projects
+            if not pm.is_temp_project(PROJECTS_DIR / group / project)
         ]
+
         df_concat = pd.DataFrame(
-            sorted(projects if show_temps else non_temp_projects), columns=[group]
+            sorted(projects if temps else non_temp_projects), columns=[group]
         )
 
         df = pd.concat([df, df_concat], axis=1)
 
     df = df.fillna("")
 
-    table = df_to_table(df)
+    table: Table = df_to_table(df)
 
     console = Console()
     console.print(table)
