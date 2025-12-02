@@ -1,0 +1,5 @@
+{date wrote TODO}
+todo
+
+2/11/12
+remove error tracebacks

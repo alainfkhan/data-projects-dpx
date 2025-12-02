@@ -18,12 +18,13 @@ from src.dpx.utils.paths import PROJECTS_DIR
 
 app = typer.Typer()
 pm = ProjectsManager()
+current_main = "main"
 
 
 @app.command()
 def rm(
     names: Annotated[list[str] | None, typer.Argument()] = None,
-    group: Annotated[str, typer.Option("-g", "--group")] = "main",
+    group: Annotated[str, typer.Option("-g", "--group")] = current_main,
     playground: Annotated[bool, typer.Option("-p", "--playground")] = False,
     search_all: Annotated[bool, typer.Option("--all")] = False,
     temps: Annotated[bool, typer.Option("-t", "--temps")] = False,
@@ -34,21 +35,22 @@ def rm(
     dpx rm test
         Removes project 'test' in group main.
 
-    dpx rm test dataset --all-groups
+    dpx rm test dataset --all
         Searches all groups and removes projects 'test' and 'dataset'
 
     dpx rm -t -p
         Removes all temp projects in playground.
 
     dpx rm --all-temps
-    dpx rm -t --all-groups
+    dpx rm -t --all
         Searches all groups and removes all temp projects.
     """
 
     def delete(filepaths: list[Path]) -> None:
         for f in filepaths:
             try:
-                shutil.rmtree(f)
+                # shutil.rmtree(f)
+                print(f"'{f.name}' deleted from '{f.parent.name}'")
             except FileNotFoundError:
                 print(f"'{f.name}' not a project in '{f.parent.name}'")
         pass
@@ -63,11 +65,10 @@ def rm(
     if playground:
         group = "playground"
 
-    group_path = PROJECTS_DIR / group
     to_remove: list[Path] = []
 
     if temps:
-        temp_projects = pm.list_project_paths(
+        temp_projects = pm.list_projects_paths(
             pm.groups if search_all else [group], show_non_temps=False
         )
         to_remove = to_remove + temp_projects
@@ -75,7 +76,7 @@ def rm(
     if names is not None:
         for name in names:
             pm.verify_project(name)
-            to_remove.append(group_path / name)
+            to_remove.append(PROJECTS_DIR / pm.get_group_from_project(name) / name)
 
     delete(to_remove)
 
@@ -94,3 +95,14 @@ def rm(
     # if temps:
     #     ic(pm.all_project_paths)
     #     ic(pm.all_temps_paths)
+
+
+@app.command()
+def dev(input: Annotated[str, typer.Option()] = "") -> None:
+
+    groups = pm.groups
+    p_path = pm.list_projects_paths(groups)
+
+    # p = pm.list_projects(groups)
+
+    ic(p_path)

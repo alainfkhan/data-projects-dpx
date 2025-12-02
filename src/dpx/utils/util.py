@@ -20,13 +20,6 @@ temp_prefix = "~"
 
 copy_attachment = "-copy"
 random_string_length = 6
-data_folder_names: list[str] = [
-    "raw",
-    "interim",
-    "processed",
-    "external",
-    "db",
-]
 
 
 def random_string(length: int = random_string_length) -> str:

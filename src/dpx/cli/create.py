@@ -15,8 +15,12 @@ from icecream import ic
 from rich import print
 from typing_extensions import Annotated
 
-from src.dpx.cli.util import ProjectsManager
-from src.dpx.utils.util import temp_prefix, copy_attachment, random_string
+from src.dpx.cli.util import ProjectsManager, FileManager
+from src.dpx.utils.util import (
+    temp_prefix,
+    copy_attachment,
+    random_string,
+)
 from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
 
 doptions: list[str] = ["ripe", "metal"]
@@ -26,6 +30,7 @@ doptions: list[str] = ["ripe", "metal"]
 
 base_ddir = "r"
 default_doption = "ripe"
+current_main = "main"
 
 app = typer.Typer()
 pm = ProjectsManager()
@@ -72,7 +77,7 @@ def init(
     ] = False,
     group: Annotated[
         str, typer.Option("-g", "--g", help="Choose the project group.")
-    ] = "main",
+    ] = current_main,
     # doption: Annotated[str, typer.Option()] = doption,
     url: Annotated[str | None, typer.Option("-u", "--url")] = None,
     force: Annotated[bool, typer.Option("-f", "--force")] = False,
@@ -83,7 +88,8 @@ def init(
         Initialise a workspace called 'smith-somedataset' in the main group.
 
     dpx init smith-somedataset -url <url> -g <group>
-        Initialise a project called 'smith-somedataset' with data downloaded from <url>
+        Initialise a project called 'smith-somedataset'
+        with data downloaded from <url>
         in group <group>
     """
 
@@ -98,7 +104,10 @@ def init(
     this_project_path.mkdir()
 
     # make data folders
-    # make init folders
+    fm = FileManager(this_project_path)
+    fm.mkdir_data_folders()
+
+    # make other init folders
 
     # if url valid download to data/raw
     # add url to sources.txt

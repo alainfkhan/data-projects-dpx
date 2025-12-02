@@ -27,16 +27,16 @@ from src.dpx.utils.util import df_to_table, temp_prefix
 
 ide = "code"
 ides = ["code", "vim"]
-
+current_main = "main"
 app = typer.Typer()
 pm = ProjectsManager()
 
 
 @app.command(help="List projects.")
 def ls(
-    groups: Annotated[list[str], typer.Argument(help="Choose the project groups.")] = [
-        "main"
-    ],
+    groups: Annotated[
+        list[str], typer.Option("-g", "--group", help="Choose the project groups.")
+    ] = [current_main],
     playground: Annotated[
         bool,
         typer.Option(
@@ -82,27 +82,22 @@ def ls(
         temps = True
 
     if show_all:
-        diff = set(pm.groups)
+        diff = pm.groups
         diff.remove("main")
         diff.remove("playground")
-        diff.remove(".trash")
 
-        groups = ["main", "playground", *diff, ".trash"]
+        groups = ["main", "playground", *sorted(diff)]
 
     df = pd.DataFrame()
-
     for group in groups:
-        projects = pm.list_projects_OLD(group)
-        non_temp_projects = [
-            project
-            for project in projects
-            if not pm.is_temp_project(PROJECTS_DIR / group / project)
-        ]
+        t = pm.list_projects_paths([group], show_non_temps=False)
+
+        projects = pm.list_projects([group], show_temps=temps)
 
         df_concat = pd.DataFrame(
-            sorted(projects if temps else non_temp_projects), columns=[group]
+            sorted(projects),
+            columns=[f"[{len(projects)}]{f' ({len(t)})' if temps else ''} {group}/"],
         )
-
         df = pd.concat([df, df_concat], axis=1)
 
     df = df.fillna("")

@@ -29,8 +29,8 @@ from icecream import ic
 
 from src.dpx.utils.paths import PROJECTS_DIR
 
-
 temp_prefix = "~"
+current_main = "main"
 
 
 # Groups
@@ -38,8 +38,7 @@ class GroupsManager:
     """Manager of groups."""
 
     base_name = PROJECTS_DIR.name
-    reserved_projects = ["main", "playground", ".trash"]
-    main_group = "main"
+    reserved_projects = ["main", "playground", ".hidden"]
 
     def _is_group(self, filepath: Path) -> bool:
         """Whether this filepath is a group.
@@ -47,12 +46,17 @@ class GroupsManager:
         A filepath is a group iff:
             in projects/
             a folder
+            doesnt start with '.'
         """
+
+        reject_prefix: tuple[str, ...] = (".",)
 
         is_in_base = filepath.parent.name == self.base_name
         is_folder = filepath.is_dir()
 
-        is_valid = is_in_base and is_folder
+        is_rejected_prefix = True if filepath.name.startswith(reject_prefix) else False
+
+        is_valid = is_in_base and is_folder and not is_rejected_prefix
         return is_valid
 
     def _list_groups(self) -> list[str]:
@@ -125,14 +129,15 @@ class ProjectsManager(GroupsManager):
         is_valid = self.is_project(filepath) and is_id
         return is_valid
 
-    # Projects
-
-    def list_project_paths(
+    def list_projects_paths(
         self,
-        groups: list[str] = ["main"],
+        groups: list[str] = [current_main],
+        *,
         show_temps: bool = True,
         show_non_temps: bool = True,
     ) -> list[Path]:
+        """List the project inside a group given a selection of groups"""
+
         to_show: list[Path] = []
 
         for group in groups:
@@ -164,73 +169,27 @@ class ProjectsManager(GroupsManager):
 
         return to_show
 
-    def list_projects_OLD(self, group_name: str) -> list[str]:
-        """Returns a list of all projects in a group."""
+    def list_projects(
+        self,
+        # *args,
+        # **kwargs
+        groups: list[str] = [current_main],
+        *,
+        show_temps: bool = True,
+        show_non_temps: bool = True,
+    ) -> list[str]:
+        """List project names given a selection of groups"""
 
-        group_path: Path = PROJECTS_DIR / group_name
-        objects: list[str] = os.listdir(group_path)
-
-        project_names: list[str] = [
-            obj for obj in objects if self.is_project(group_path / obj)
-        ]
-        # project_names: list[str] = []
-        # for file in files:
-        #     if is_valid_project(group_path / file):
-        #         project_names.append(file)
-
-        return project_names
-
-    def _list_all_project_paths_OLD(self) -> list[Path]:
-        """Returns a list of all project paths in each group."""
-
-        all_project_paths: list[Path] = []
-        for group in self._list_groups():
-            home = PROJECTS_DIR / group
-
-            projects = self.list_projects_OLD(group)
-            for project in projects:
-                all_project_paths.append(home / project)
-
-        return all_project_paths
-
-    def _list_all_projects_OLD(self) -> list[str]:
-        """Returns a list of all projects (names) in each group."""
-
-        all_projects: list[str] = []
-        for project_path in self._list_all_project_paths_OLD():
-            all_projects.append(project_path.name)
-
-        return all_projects
-
-    # Temp projects
-    def list_temp_projects_OLD(self, group: str) -> list[str]:
-        """Returns a list of all temp projects in a group."""
-        projects = self.list_projects_OLD(group)
-        temp_projects = [
-            project
-            for project in projects
-            if self.is_temp_project(PROJECTS_DIR / group / project)
-        ]
-
-        return temp_projects
-
-    def _list_all_temp_project_paths_OLD(self) -> list[Path]:
-        all_temp_project_paths: list[Path] = []
-        for group in self.groups:
-            temp_project_path: list[Path] = [
-                PROJECTS_DIR / group / temp_project
-                for temp_project in self.list_temp_projects_OLD(group)
-            ]
-            all_temp_project_paths = all_temp_project_paths + temp_project_path
-
-        return all_temp_project_paths
+        # project_paths: list[Path] = self.list_projects_paths(*args, **kwargs)
+        project_paths: list[Path] = self.list_projects_paths(
+            groups=groups, show_temps=show_temps, show_non_temps=show_non_temps
+        )
+        return [p.name for p in project_paths]
 
     def __init__(self) -> None:
         super().__init__()
-        self.all_projects = self._list_all_projects_OLD()
-        self.all_project_paths = self._list_all_project_paths_OLD()
-
-        self.all_temps_paths = self._list_all_temp_project_paths_OLD()
+        self.projects = self.list_projects(self.groups)
+        self.project_paths = self.list_projects_paths(self.groups)
 
     def verify_project(self, project_candidate: str) -> None:
         """Raises an error if the input is not a valid project."""
@@ -240,7 +199,7 @@ class ProjectsManager(GroupsManager):
     def get_group_from_project(self, project: str) -> str:
         """Get group name from project name."""
 
-        for project_path in self._list_all_project_paths_OLD():
+        for project_path in self.list_projects_paths(self.groups):
             if project_path.name == project:
                 return project_path.parent.name
 
@@ -253,7 +212,7 @@ class ProjectsManager(GroupsManager):
         """
 
         # unique project name
-        if new_project in self._list_all_projects_OLD():
+        if new_project in self.projects:
             raise FileExistsError(
                 f"'{new_project}' already exists in the project group: '{self.get_group_from_project(new_project)}'."
             )
@@ -261,14 +220,32 @@ class ProjectsManager(GroupsManager):
         return True
 
 
-"""
+class FileManager:
+    """Manages files within the project"""
+
+    data_folder_names = {
+        "raw": "raw",
+        "interim": "interim",
+        "processed": "processed",
+        "external": "external",
+    }
+
+    def __init__(
+        self, project_path: Path, data_folder_names=data_folder_names.values()
+    ) -> None:
+        self.project_path = project_path
+        self.data_folder_names = data_folder_names
+        pass
+
+    def mkdir_data_folders(self) -> None:
+        pass
+
+    def mkdir_other_files(self) -> None:
+        pass
+
+    def add_db(self) -> None:
+        pass
 
 
-
-
-
-
-
-
-
-"""
+class Project:
+    pm = ProjectsManager()
