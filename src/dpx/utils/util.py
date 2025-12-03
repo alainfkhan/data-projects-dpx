@@ -1,17 +1,20 @@
 """General purpose util functions not specific to the CLI app.
-Config vars goes here
+Util functions that could be used in other programs.
 """
 
 import string
 import random
 from typing import Dict
 
+import nbformat as nbf
 from icecream import ic
+from nbformat import NotebookNode
 from pandas import DataFrame, Series
 from pathlib import Path
 from rich.table import Table
 
 from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
+
 
 """Configuration variables"""
 
@@ -20,6 +23,8 @@ temp_prefix = "~"
 
 copy_attachment = "-copy"
 random_string_length = 6
+
+type Tree = dict[str, None | Tree]
 
 
 def random_string(length: int = random_string_length) -> str:
@@ -31,25 +36,6 @@ def random_string(length: int = random_string_length) -> str:
         output += random.choice(characters)
 
     return output
-
-
-# def mkdir_project(project_name: str) -> Dict[str, Path]:
-#     new_project_dir: Path = PROJECTS_DIR / project_name
-#     (new_project_dir).mkdir()
-#     return {project_name: new_project_dir}
-
-
-# def mkdir_data_folders(project_dir: Path) -> Dict[str, Path]:
-#     data_folders_dirs: Dict[str, Path] = {}
-
-#     data_dir: Path = project_dir / "data"
-
-#     for name in data_folder_names:
-#         data_folder: Path = data_dir / name
-#         Path(data_folder).mkdir(parents=True, exist_ok=True)
-#         data_folders_dirs[name] = data_folder
-
-#     return data_folders_dirs
 
 
 # def csv_to_excel(csv_file: Path) -> None:
@@ -70,3 +56,45 @@ def df_to_table(df: DataFrame) -> Table:
         table.add_row(*row_list)
 
     return table
+
+
+def create_structure(base_path: Path, tree: Tree) -> None:
+    """Creates file directories in a following the structure in tree
+
+    if:
+        at some base_path: "some/folder",
+        tree = {
+            "folder": {
+                "file.txt": None
+            }
+        }
+    then:
+        create_structure(base_path, tree)
+        creates a folder: "folder", and a file: "file.txt" inside "folder"
+        in "some/folder"
+            so "some/folder/folder/file.txt" exists
+
+    """
+
+    for folder_name, subtree in tree.items():
+        folder_path = base_path / folder_name
+
+        # If file
+        if subtree is None:
+            folder_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # TODO: fix notebook type checking
+            # .ipynb
+            if folder_path.name.endswith(".ipynb"):
+                nb: NotebookNode = nbf.v4.new_notebook()
+                nb["cells"].append(nbf.v4.new_code_cell())
+                with open(folder_path, "w") as f:
+                    nbf.write(nb, f)
+                pass
+            else:
+                folder_path.touch(exist_ok=True)
+
+        # If folder
+        else:
+            folder_path.mkdir(parents=True, exist_ok=True)
+            create_structure(base_path=folder_path, tree=subtree)

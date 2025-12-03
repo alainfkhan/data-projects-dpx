@@ -32,43 +32,40 @@ app = typer.Typer()
 pm = ProjectsManager()
 
 
-@app.command(help="List projects.")
+@app.command(help="List project(s).")
 def ls(
-    groups: Annotated[
-        list[str], typer.Option("-g", "--group", help="Choose the project groups.")
-    ] = [current_main],
+    groups: Annotated[list[str], typer.Option("-g", "--group", help="List projects in group(s).")] = [current_main],
     playground: Annotated[
         bool,
-        typer.Option(
-            "-p", "--playground", help="List projects in the playground group."
-        ),
+        typer.Option("-p", "--playground", help="List projects in playground."),
     ] = False,
     show_all: Annotated[
         bool,
-        typer.Option("--all", help="List projects from all project groups."),
+        typer.Option("--all", help="List projects from all groups."),
     ] = False,
-    temps: Annotated[
-        bool, typer.Option("-t", "--temps", help="List temporary projects.")
+    temps: Annotated[bool, typer.Option("-t", "--temps", help="Show temporary projects.")] = False,
+    show_all_temps: Annotated[
+        bool, typer.Option("--all-temps", help="Show temporary projects in all groups. The same as '--all --temps'")
     ] = False,
-    show_all_temps: Annotated[bool, typer.Option("--all-temps")] = False,
 ) -> None:
-    """List project names from a project group.
+    """Examples:
 
     dpx ls
         List all non-temp projects from the main group.
 
     dpx ls -p
-        List all non-temp projects from the playground group.
+        List all non-temp projects from playground.
 
     dpx ls -t
         List all projects including temps from the main group.
-        Similar to ls -a
+        Similar to the UNIX command: ls -a
 
-    dpx ls --all-groups
+    dpx ls --all-temps
         List all non-temp projects from all project groups.
+        The same as: dpx ls --all --temps
 
     dpx ls portfolio main playground
-        List all non-temp projects from groups: portfolio, main, and playground.
+        List all non-temp projects from groups: portfolio, main, and playground, respectively.
     """
 
     for group in groups:
@@ -106,6 +103,24 @@ def ls(
 
     console = Console()
     console.print(table)
+
+
+@app.command(help="List groups.")
+def gls(
+    toggle_unreachable: Annotated[bool, typer.Option("-f", help="Show unreachable project folders.")] = False,
+) -> None:
+    exclude_files = {".git", ".DS_Store", ".gitignore", "README.md"}
+
+    groups = pm.groups
+    if toggle_unreachable:
+        all_dirs = set(os.listdir(PROJECTS_DIR))
+        to_show = all_dirs.difference(set(groups)).difference(exclude_files)
+
+        print(to_show)
+    else:
+        print(groups)
+
+    return
 
 
 # @app.command()

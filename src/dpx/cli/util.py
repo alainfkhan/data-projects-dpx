@@ -1,39 +1,49 @@
 """Util functions specific to CLI app
 
-TODO: put functions in class for easy imports
-
 projects/                       <- base
     .git
     .gitignore
-    main/                       <- group
+    main/                       <- group one
         main_project_one/       <- project
         ...
         main_project_n/
 
-    playground/
-    group_one/
+    playground/                 <- group two
+    folder_three/
     ...
-    group_n/
+    folder_n/
+    .folder_one/                <- hidden folder, not a group
+    ...
+    .folder_n/
     README.md
 
 Define:
+group       A visible collection of projects
 verify      if something is true
 validate    if something can be done
 all         refers to all groups
 """
+# from __future__ import annotations
 
 import os
+
+# from typing import Dict, Optional, TypeAlias, Union
+from typing import Callable
 from pathlib import Path
 
 from icecream import ic
 
 from src.dpx.utils.paths import PROJECTS_DIR
+from src.dpx.utils.util import Tree, create_structure
 
+# Custom definitions
 temp_prefix = "~"
 current_main = "main"
 
 
-# Groups
+# type Tree = dict[str, None | Tree]
+
+
 class GroupsManager:
     """Manager of groups."""
 
@@ -49,24 +59,29 @@ class GroupsManager:
             doesnt start with '.'
         """
 
-        reject_prefix: tuple[str, ...] = (".",)
+        exclude: tuple[str, ...] = (".",)
 
         is_in_base = filepath.parent.name == self.base_name
         is_folder = filepath.is_dir()
 
-        is_rejected_prefix = True if filepath.name.startswith(reject_prefix) else False
+        is_rejected_prefix = True if filepath.name.startswith(exclude) else False
 
         is_valid = is_in_base and is_folder and not is_rejected_prefix
         return is_valid
+
+    def order_groups(self, groups: list[str]) -> list[str]:
+        groups.remove("main")
+        groups.remove("playground")
+
+        output: list[str] = ["main", "playground"] + sorted(groups)
+        return output
 
     def _list_groups(self) -> list[str]:
         """Returns a list of all groups (names)."""
 
         files: list[str] = os.listdir(PROJECTS_DIR)
 
-        valid_groups: list[str] = [
-            file for file in files if self._is_group(PROJECTS_DIR / file)
-        ]
+        valid_groups: list[str] = [file for file in files if self._is_group(PROJECTS_DIR / file)]
         # valid_groups: list[str] = []
         # for obj in objects:
         #     if is_group(PROJECTS_DIR / obj):
@@ -74,7 +89,9 @@ class GroupsManager:
         return valid_groups
 
     def __init__(self) -> None:
-        self.groups: list[str] = self._list_groups()
+        groups = self._list_groups()
+
+        self.groups: list[str] = self.order_groups(groups)
         self.groups_paths = [PROJECTS_DIR / group for group in self.groups]
 
     def verify_group(self, group_candidate: str) -> None:
@@ -147,19 +164,11 @@ class ProjectsManager(GroupsManager):
             # Filepaths in group
             files = os.listdir(group_path)
 
-            project_paths: list[Path] = [
-                group_path / file
-                for file in files
-                if self.is_project(group_path / file)
-            ]
+            project_paths: list[Path] = [group_path / file for file in files if self.is_project(group_path / file)]
             temp_project_paths: list[Path] = [
-                group_path / file
-                for file in files
-                if self.is_temp_project(group_path / file)
+                group_path / file for file in files if self.is_temp_project(group_path / file)
             ]
-            non_temp_project_paths: list[Path] = list(
-                set(project_paths).difference(set(temp_project_paths))
-            )
+            non_temp_project_paths: list[Path] = list(set(project_paths).difference(set(temp_project_paths)))
 
             if show_temps:
                 to_show: list[Path] = to_show + temp_project_paths
@@ -169,6 +178,7 @@ class ProjectsManager(GroupsManager):
 
         return to_show
 
+    # TODO: simplify args to match list_projects_paths()
     def list_projects(
         self,
         # *args,
@@ -194,7 +204,8 @@ class ProjectsManager(GroupsManager):
     def verify_project(self, project_candidate: str) -> None:
         """Raises an error if the input is not a valid project."""
 
-        pass
+        if project_candidate not in self.projects:
+            raise ValueError(f"'{project_candidate}' is not a valid project.")
 
     def get_group_from_project(self, project: str) -> str:
         """Get group name from project name."""
@@ -209,6 +220,10 @@ class ProjectsManager(GroupsManager):
         """Checks whether a project with this name can be created.
         Can create new project iff
             unique name
+            not temp type
+
+        TODO: reduce coupling, temps defined by startswith char
+        give warning if name starts with temp_prefix
         """
 
         # unique project name
@@ -217,13 +232,19 @@ class ProjectsManager(GroupsManager):
                 f"'{new_project}' already exists in the project group: '{self.get_group_from_project(new_project)}'."
             )
 
+        # Quick fix
+        if new_project.startswith(temp_prefix):
+            raise Warning(
+                f"Initialisation failed. '{new_project}' classified as a temporary project, susceptible to easy deletion."
+            )
+
         return True
 
 
 class FileManager:
-    """Manages files within the project"""
+    """Manages files within a chosen project."""
 
-    data_folder_names = {
+    default_data_folder_names_map = {
         "raw": "raw",
         "interim": "interim",
         "processed": "processed",
@@ -231,19 +252,71 @@ class FileManager:
     }
 
     def __init__(
-        self, project_path: Path, data_folder_names=data_folder_names.values()
+        self,
+        this_project_path: Path,
+        data_folder_names: list[str] = list(default_data_folder_names_map.values()),
     ) -> None:
-        self.project_path = project_path
+        self.this_project_path = this_project_path
         self.data_folder_names = data_folder_names
-        pass
+
+        r = self.default_data_folder_names_map["raw"]
+        i = self.default_data_folder_names_map["interim"]
+        p = self.default_data_folder_names_map["processed"]
+        e = self.default_data_folder_names_map["external"]
+
+        """Structure rules:
+        folder:
+            key = "name"
+            does not end in .ext
+            has value {}
+
+        file:
+            key = "name.ext"
+            ends in .ext
+            has value None
+            
+        Known files:
+            .txt, .md
+            .ipynb
+        
+        """
+        # Plans to separate structures to be inputs in config
+        data_folders_structure: Tree = {
+            "data": {
+                f"{r}": {},
+                f"{i}": {},
+                f"{p}": {},
+                f"{e}": {},
+            }
+        }
+
+        # Need to idenfify the location of the data dump
+        data_dump_folder: Tree = {"data": {f"{r}": {}}}
+
+        db_folder_structure: Tree = {"data": {"db": {}}}
+
+        other_files_structure: Tree = {
+            "docs": {"assets": {}, "notes.txt": None},
+            "notebooks": {f"{self.this_project_path.name}.ipynb": None},
+            "references": {"sources.txt": None},
+            "reports": {"figures": {}},
+            "README.md": None,
+        }
+
+        self.data_folders_structure = data_folders_structure
+        self.db_folder_structure = db_folder_structure
+        self.other_files_structure = other_files_structure
 
     def mkdir_data_folders(self) -> None:
+        create_structure(base_path=self.this_project_path, tree=self.data_folders_structure)
         pass
 
     def mkdir_other_files(self) -> None:
+        create_structure(base_path=self.this_project_path, tree=self.other_files_structure)
         pass
 
     def add_db(self) -> None:
+        create_structure(base_path=self.this_project_path, tree=self.db_folder_structure)
         pass
 
 

@@ -21,35 +21,45 @@ pm = ProjectsManager()
 current_main = "main"
 
 
-@app.command()
+@app.command(help="Delete project(s).")
 def rm(
-    names: Annotated[list[str] | None, typer.Argument()] = None,
-    group: Annotated[str, typer.Option("-g", "--group")] = current_main,
-    playground: Annotated[bool, typer.Option("-p", "--playground")] = False,
-    search_all: Annotated[bool, typer.Option("--all")] = False,
-    temps: Annotated[bool, typer.Option("-t", "--temps")] = False,
-    rm_all_temps: Annotated[bool, typer.Option("--all-temps")] = False,
+    names: Annotated[list[str] | None, typer.Argument(help="The name of the project(s) you want to delete.")] = None,
+    group: Annotated[str, typer.Option("-g", "--group", help="Search in a group.")] = current_main,
+    playground: Annotated[bool, typer.Option("-p", "--playground", help="Search in playground.")] = False,
+    search_all: Annotated[bool, typer.Option("--all", help="Search in all groups.")] = False,
+    temps: Annotated[
+        bool, typer.Option("-t", "--temps", help="Remove all temporary projects in a selection of groups.")
+    ] = False,
+    rm_all_temps: Annotated[
+        bool,
+        typer.Option("--all-temps", help="Remove all temporary projects in all groups. The same as '--all --temps'"),
+    ] = False,
 ) -> None:
-    """Delete projects.
+    """Examples:
 
-    dpx rm test
-        Removes project 'test' in group main.
+    dpx rm test1
+        Delete 'test1' in the main group.
 
-    dpx rm test dataset --all
-        Searches all groups and removes projects 'test' and 'dataset'
+    dpx rm test1 test2
+        Delete 'test1' and 'test2' in the main group.
+
+    dpx rm playgroundp -p
+        Dalete 'playgroundp' in playground.
+
+    dpx rm mainp playgroundp --all
+        Delete 'mainp' and 'playgroundp' searching all groups.
 
     dpx rm -t -p
-        Removes all temp projects in playground.
+        Delete all temporary projects in playground.
 
-    dpx rm --all-temps
-    dpx rm -t --all
-        Searches all groups and removes all temp projects.
+    dpx rm --all -t
+        Delete all temporary projects searching in all groups.
     """
 
     def delete(filepaths: list[Path]) -> None:
         for f in filepaths:
             try:
-                # shutil.rmtree(f)
+                shutil.rmtree(f)
                 print(f"'{f.name}' deleted from '{f.parent.name}'")
             except FileNotFoundError:
                 print(f"'{f.name}' not a project in '{f.parent.name}'")
@@ -68,15 +78,13 @@ def rm(
     to_remove: list[Path] = []
 
     if temps:
-        temp_projects = pm.list_projects_paths(
-            pm.groups if search_all else [group], show_non_temps=False
-        )
+        temp_projects = pm.list_projects_paths(pm.groups if search_all else [group], show_non_temps=False)
         to_remove = to_remove + temp_projects
 
     if names is not None:
         for name in names:
             pm.verify_project(name)
-            to_remove.append(PROJECTS_DIR / pm.get_group_from_project(name) / name)
+            to_remove.append(PROJECTS_DIR / group / name)
 
     delete(to_remove)
 
@@ -87,22 +95,3 @@ def rm(
     #             f"Could not find project: '{name}' in {'any group' if search_all_groups else f"group: '{group}'"}."
     #         )
     #     to_remove.append(PROJECTS_DIR / group / name)
-    #     ic(f"removing {name}")
-
-    # if all_temps:
-    #     temps = True
-
-    # if temps:
-    #     ic(pm.all_project_paths)
-    #     ic(pm.all_temps_paths)
-
-
-@app.command()
-def dev(input: Annotated[str, typer.Option()] = "") -> None:
-
-    groups = pm.groups
-    p_path = pm.list_projects_paths(groups)
-
-    # p = pm.list_projects(groups)
-
-    ic(p_path)
