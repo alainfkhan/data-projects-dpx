@@ -34,18 +34,41 @@ pm = ProjectsManager()
 
 @app.command(help="List project(s).")
 def ls(
-    groups: Annotated[list[str], typer.Option("-g", "--group", help="List projects in group(s).")] = [current_main],
+    groups: Annotated[
+        list[str],
+        typer.Argument(
+            help="List projects in group(s).",
+        ),
+    ] = [current_main],
     playground: Annotated[
         bool,
-        typer.Option("-p", "--playground", help="List projects in playground."),
+        typer.Option(
+            "-p",
+            "--playground",
+            help="List projects in playground.",
+        ),
     ] = False,
     show_all: Annotated[
         bool,
-        typer.Option("--all", help="List projects from all groups."),
+        typer.Option(
+            "--all",
+            help="List projects from all groups.",
+        ),
     ] = False,
-    temps: Annotated[bool, typer.Option("-t", "--temps", help="Show temporary projects.")] = False,
+    temps: Annotated[
+        bool,
+        typer.Option(
+            "-t",
+            "--temps",
+            help="Show temporary projects.",
+        ),
+    ] = False,
     show_all_temps: Annotated[
-        bool, typer.Option("--all-temps", help="Show temporary projects in all groups. The same as '--all --temps'")
+        bool,
+        typer.Option(
+            "--all-temps",
+            help="Show temporary projects in all groups. The same as '--all --temps'",
+        ),
     ] = False,
 ) -> None:
     """Examples:
@@ -70,20 +93,17 @@ def ls(
 
     for group in groups:
         pm.verify_group(group)
+        print(group)
 
     if playground:
-        groups = ["playground"]
+        groups.append("playground")
 
     if show_all_temps:
         show_all = True
         temps = True
 
     if show_all:
-        diff = pm.groups
-        diff.remove("main")
-        diff.remove("playground")
-
-        groups = ["main", "playground", *sorted(diff)]
+        groups = pm.groups
 
     df = pd.DataFrame()
     for group in groups:
@@ -107,19 +127,28 @@ def ls(
 
 @app.command(help="List groups.")
 def gls(
-    toggle_unreachable: Annotated[bool, typer.Option("-f", help="Show unreachable project folders.")] = False,
+    toggle_unreachable: Annotated[
+        bool,
+        typer.Option(
+            "-f",
+            help="Show unreachable project folders.",
+        ),
+    ] = False,
 ) -> None:
-    exclude_files = {".git", ".DS_Store", ".gitignore", "README.md"}
+    # hotfix
+    exclude_files = {".git", ".gitignore", ".DS_Store", "README.md"}
 
-    groups = pm.groups
+    to_show: list[str] = []
+
+    groups: list[str] = pm.groups
     if toggle_unreachable:
-        all_dirs = set(os.listdir(PROJECTS_DIR))
-        to_show = all_dirs.difference(set(groups)).difference(exclude_files)
+        all_dirs = os.listdir(PROJECTS_DIR)
+        to_show += list(set(all_dirs).difference(set(groups)).difference(set(exclude_files)))
 
-        print(to_show)
     else:
-        print(groups)
+        to_show += groups
 
+    print(to_show)
     return
 
 

@@ -65,8 +65,12 @@ pm = ProjectsManager()
 
 @app.command(help="Initialise a project workspace in an existing project group.")
 def init(
-    name: Annotated[str, typer.Argument(help="The name of the project you want to initialise.")] = temp_prefix
-    + random_string(),
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the project you want to initialise.",
+        ),
+    ] = temp_prefix + random_string(),
     playground: Annotated[
         bool,
         typer.Option(
@@ -75,10 +79,29 @@ def init(
             help="Initialise a project in playground.",
         ),
     ] = False,
-    group: Annotated[str, typer.Option("-g", "--g", help="Initialise a project in group.")] = current_main,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--g",
+            help="Initialise a project in group.",
+        ),
+    ] = current_main,
     # doption: Annotated[str, typer.Option()] = doption,
-    url: Annotated[str | None, typer.Option("-u", "--url")] = None,
-    force: Annotated[bool, typer.Option("-f", "--force")] = False,
+    url: Annotated[
+        str | None,
+        typer.Option(
+            "-u",
+            "--url",
+        ),
+    ] = None,
+    force: Annotated[
+        bool,
+        typer.Option(
+            "-f",
+            "--force",
+        ),
+    ] = False,
 ) -> None:
     """Initialises a workspace.
 

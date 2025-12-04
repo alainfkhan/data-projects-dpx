@@ -3,7 +3,7 @@ from typing import Annotated
 
 from icecream import ic
 
-from src.dpx.cli.util import FileManager
+from src.dpx.cli.util import FileManager, ProjectsManager
 from src.dpx.utils.paths import PROJECTS_DIR
 
 app = typer.Typer()
@@ -11,6 +11,7 @@ app = typer.Typer()
 test_project = "test"
 test_project_path = PROJECTS_DIR / "main" / test_project
 fm = FileManager(test_project_path)
+pm = ProjectsManager()
 
 
 @app.command()
@@ -21,6 +22,8 @@ def hello(name: Annotated[str, typer.Argument()]) -> None:
 
 @app.command()
 def main() -> None:
+    y = pm.groups
+    ic(y)
     x = fm.other_files_structure.items()
     ic(x)
 

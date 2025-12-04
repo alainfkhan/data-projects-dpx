@@ -23,16 +23,49 @@ current_main = "main"
 
 @app.command(help="Delete project(s).")
 def rm(
-    names: Annotated[list[str] | None, typer.Argument(help="The name of the project(s) you want to delete.")] = None,
-    group: Annotated[str, typer.Option("-g", "--group", help="Search in a group.")] = current_main,
-    playground: Annotated[bool, typer.Option("-p", "--playground", help="Search in playground.")] = False,
-    search_all: Annotated[bool, typer.Option("--all", help="Search in all groups.")] = False,
+    names: Annotated[
+        list[str] | None,
+        typer.Argument(
+            help="The name of the project(s) you want to delete.",
+        ),
+    ] = None,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--group",
+            help="Search in a group.",
+        ),
+    ] = current_main,
+    playground: Annotated[
+        bool,
+        typer.Option(
+            "-p",
+            "--playground",
+            help="Search in playground.",
+        ),
+    ] = False,
+    search_all: Annotated[
+        bool,
+        typer.Option(
+            "--all",
+            help="Search in all groups.",
+        ),
+    ] = False,
     temps: Annotated[
-        bool, typer.Option("-t", "--temps", help="Remove all temporary projects in a selection of groups.")
+        bool,
+        typer.Option(
+            "-t",
+            "--temps",
+            help="Remove all temporary projects in a selection of groups.",
+        ),
     ] = False,
     rm_all_temps: Annotated[
         bool,
-        typer.Option("--all-temps", help="Remove all temporary projects in all groups. The same as '--all --temps'"),
+        typer.Option(
+            "--all-temps",
+            help="Remove all temporary projects in all groups. The same as '--all --temps'",
+        ),
     ] = False,
 ) -> None:
     """Examples:
@@ -57,6 +90,7 @@ def rm(
     """
 
     def delete(filepaths: list[Path]) -> None:
+        """Want to change to move to .trash/"""
         for f in filepaths:
             try:
                 shutil.rmtree(f)
@@ -78,7 +112,10 @@ def rm(
     to_remove: list[Path] = []
 
     if temps:
-        temp_projects = pm.list_projects_paths(pm.groups if search_all else [group], show_non_temps=False)
+        temp_projects = pm.list_projects_paths(
+            pm.groups if search_all else [group],
+            show_non_temps=False,
+        )
         to_remove = to_remove + temp_projects
 
     if names is not None:

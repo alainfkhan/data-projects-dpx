@@ -81,7 +81,13 @@ class GroupsManager:
 
         files: list[str] = os.listdir(PROJECTS_DIR)
 
-        valid_groups: list[str] = [file for file in files if self._is_group(PROJECTS_DIR / file)]
+        valid_groups: list[str] = [
+            file
+            for file in files
+            if self._is_group(
+                PROJECTS_DIR / file,
+            )
+        ]
         # valid_groups: list[str] = []
         # for obj in objects:
         #     if is_group(PROJECTS_DIR / obj):
@@ -164,17 +170,30 @@ class ProjectsManager(GroupsManager):
             # Filepaths in group
             files = os.listdir(group_path)
 
-            project_paths: list[Path] = [group_path / file for file in files if self.is_project(group_path / file)]
+            project_paths: list[Path] = [
+                group_path / file
+                for file in files
+                if self.is_project(
+                    group_path / file,
+                )
+            ]
             temp_project_paths: list[Path] = [
-                group_path / file for file in files if self.is_temp_project(group_path / file)
+                group_path / file
+                for file in files
+                if self.is_temp_project(
+                    group_path / file,
+                )
             ]
             non_temp_project_paths: list[Path] = list(set(project_paths).difference(set(temp_project_paths)))
 
             if show_temps:
-                to_show: list[Path] = to_show + temp_project_paths
+                # to_show: list[Path] = to_show + temp_project_paths
+                to_show += temp_project_paths
 
             if show_non_temps:
-                to_show: list[Path] = to_show + non_temp_project_paths
+                # to_show: list[Path] = to_show + non_temp_project_paths
+                to_show += non_temp_project_paths
+                
 
         return to_show
 
@@ -192,7 +211,9 @@ class ProjectsManager(GroupsManager):
 
         # project_paths: list[Path] = self.list_projects_paths(*args, **kwargs)
         project_paths: list[Path] = self.list_projects_paths(
-            groups=groups, show_temps=show_temps, show_non_temps=show_non_temps
+            groups=groups,
+            show_temps=show_temps,
+            show_non_temps=show_non_temps,
         )
         return [p.name for p in project_paths]
 
@@ -291,15 +312,32 @@ class FileManager:
         }
 
         # Need to idenfify the location of the data dump
-        data_dump_folder: Tree = {"data": {f"{r}": {}}}
+        data_dump_folder: Tree = {
+            "data": {
+                f"{r}": {},
+            }
+        }
 
-        db_folder_structure: Tree = {"data": {"db": {}}}
+        db_folder_structure: Tree = {
+            "data": {
+                "db": {},
+            }
+        }
 
         other_files_structure: Tree = {
-            "docs": {"assets": {}, "notes.txt": None},
-            "notebooks": {f"{self.this_project_path.name}.ipynb": None},
-            "references": {"sources.txt": None},
-            "reports": {"figures": {}},
+            "docs": {
+                "assets": {},
+                "notes.txt": None,
+            },
+            "notebooks": {
+                f"{self.this_project_path.name}.ipynb": None,
+            },
+            "references": {
+                "sources.txt": None,
+            },
+            "reports": {
+                "figures": {},
+            },
             "README.md": None,
         }
 
