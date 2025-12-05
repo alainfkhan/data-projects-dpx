@@ -16,11 +16,12 @@ from typing_extensions import Annotated
 import typer
 import pandas as pd
 from icecream import ic
+from pandas import DataFrame
 from rich import print
 from rich.console import Console
 from rich.table import Table
 
-from src.dpx.cli.util import ProjectsManager
+from src.dpx.cli.utils.util import ProjectManager
 from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import df_to_table, temp_prefix
 
@@ -29,7 +30,6 @@ ide = "code"
 ides = ["code", "vim"]
 current_main = "main"
 app = typer.Typer()
-pm = ProjectsManager()
 
 
 @app.command(help="List project(s).")
@@ -91,9 +91,10 @@ def ls(
         List all non-temp projects from groups: portfolio, main, and playground, respectively.
     """
 
+    project_manager = ProjectManager()
+
     for group in groups:
-        pm.verify_group(group)
-        print(group)
+        project_manager.verify_group(group)
 
     if playground:
         groups.append("playground")
@@ -103,13 +104,13 @@ def ls(
         temps = True
 
     if show_all:
-        groups = pm.groups
+        groups = project_manager.groups
 
     df = pd.DataFrame()
     for group in groups:
-        t = pm.list_projects_paths([group], show_non_temps=False)
+        t = project_manager.list_projects_paths([group], show_non_temps=False)
 
-        projects = pm.list_projects([group], show_temps=temps)
+        projects = project_manager.list_projects([group], show_temps=temps)
 
         df_concat = pd.DataFrame(
             sorted(projects),
@@ -117,7 +118,7 @@ def ls(
         )
         df = pd.concat([df, df_concat], axis=1)
 
-    df = df.fillna("")
+    df: DataFrame = df.fillna("")
 
     table: Table = df_to_table(df)
 
@@ -127,26 +128,26 @@ def ls(
 
 @app.command(help="List groups.")
 def gls(
-    toggle_unreachable: Annotated[
+    show_hidden: Annotated[
         bool,
         typer.Option(
-            "-f",
-            help="Show unreachable project folders.",
+            "-a",
+            help="Show hidden project folders.",
         ),
     ] = False,
 ) -> None:
     # hotfix
-    exclude_files = {".git", ".gitignore", ".DS_Store", "README.md"}
+    exclude_files = [".git", ".gitignore", ".DS_Store", "README.md"]
+
+    project_manager = ProjectManager()
 
     to_show: list[str] = []
 
-    groups: list[str] = pm.groups
-    if toggle_unreachable:
-        all_dirs = os.listdir(PROJECTS_DIR)
-        to_show += list(set(all_dirs).difference(set(groups)).difference(set(exclude_files)))
-
-    else:
-        to_show += groups
+    groups: list[str] = project_manager.groups
+    to_show += groups
+    if show_hidden:
+        all_dirs: list[str] = os.listdir(PROJECTS_DIR)
+        to_show += sorted(list(set(all_dirs).difference(set(groups)).difference(set(exclude_files))))
 
     print(to_show)
     return

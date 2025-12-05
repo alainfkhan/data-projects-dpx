@@ -13,11 +13,10 @@ import typer
 from icecream import ic
 from rich import print
 
-from src.dpx.cli.util import ProjectsManager
+from src.dpx.cli.utils.util import ProjectManager
 from src.dpx.utils.paths import PROJECTS_DIR
 
 app = typer.Typer()
-pm = ProjectsManager()
 current_main = "main"
 
 
@@ -89,8 +88,13 @@ def rm(
         Delete all temporary projects searching in all groups.
     """
 
+    project_manager = ProjectManager()
+
     def delete(filepaths: list[Path]) -> None:
         """Want to change to move to .trash/"""
+        if len(filepaths) == 0:
+            print("No files deleted.")
+
         for f in filepaths:
             try:
                 shutil.rmtree(f)
@@ -104,7 +108,7 @@ def rm(
         temps = True
 
     if names is None and not temps:
-        raise ValueError("Requires project name or temps option.")
+        raise ValueError("Requires at least one project or temps option.")
 
     if playground:
         group = "playground"
@@ -112,15 +116,17 @@ def rm(
     to_remove: list[Path] = []
 
     if temps:
-        temp_projects = pm.list_projects_paths(
-            pm.groups if search_all else [group],
+        temp_projects = project_manager.list_projects_paths(
+            project_manager.groups if search_all else [group],
             show_non_temps=False,
         )
         to_remove = to_remove + temp_projects
 
     if names is not None:
         for name in names:
-            pm.verify_project(name)
+            project_manager.verify_project(name)
+            group = project_manager.get_group_from_project(name) if search_all else group
+
             to_remove.append(PROJECTS_DIR / group / name)
 
     delete(to_remove)

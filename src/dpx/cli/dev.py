@@ -3,15 +3,16 @@ from typing import Annotated
 
 from icecream import ic
 
-from src.dpx.cli.util import FileManager, ProjectsManager
+from src.dpx.cli.utils.util import Project, ProjectManager
+from src.dpx.cli.utils.url_manager import URLDispatcher
 from src.dpx.utils.paths import PROJECTS_DIR
 
 app = typer.Typer()
 
 test_project = "test"
 test_project_path = PROJECTS_DIR / "main" / test_project
-fm = FileManager(test_project_path)
-pm = ProjectsManager()
+fm = Project(test_project_path)
+pm = ProjectManager()
 
 
 @app.command()
@@ -22,13 +23,4 @@ def hello(name: Annotated[str, typer.Argument()]) -> None:
 
 @app.command()
 def main() -> None:
-    y = pm.groups
-    ic(y)
-    x = fm.other_files_structure.items()
-    ic(x)
-
-    for name, subtree in x:
-        ic(name)
-        ic(subtree)
-
     pass

@@ -12,13 +12,17 @@ projects/                       <- base
     folder_three/
     ...
     folder_n/
-    .folder_one/                <- hidden folder, not a group
+    .folder_one/                <- archived folder, not a group
     ...
     .folder_n/
     README.md
 
 Define:
 group       A visible collection of projects
+    A group always implies its visible
+archive     A collection of projects not indended to be seen
+    archive != group
+    An archive always implies its hidden
 verify      if something is true
 validate    if something can be done
 all         refers to all groups
@@ -26,13 +30,12 @@ all         refers to all groups
 # from __future__ import annotations
 
 import os
-
-# from typing import Dict, Optional, TypeAlias, Union
-from typing import Callable
+import warnings
 from pathlib import Path
 
 from icecream import ic
 
+from src.dpx.cli.utils.url_manager import URLDispatcher
 from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import Tree, create_structure
 
@@ -40,15 +43,16 @@ from src.dpx.utils.util import Tree, create_structure
 temp_prefix = "~"
 current_main = "main"
 
-
 # type Tree = dict[str, None | Tree]
 
 
-class GroupsManager:
+class GroupManager:
     """Manager of groups."""
 
-    base_name = PROJECTS_DIR.name
-    reserved_projects = ["main", "playground", ".hidden"]
+    base_path = PROJECTS_DIR
+    base_name = base_path.name
+    reserved_groups = ["main", "playground"]
+    reserved_archives = [".hidden", ".trash"]
 
     def _is_group(self, filepath: Path) -> bool:
         """Whether this filepath is a group.
@@ -57,9 +61,13 @@ class GroupsManager:
             in projects/
             a folder
             doesnt start with '.'
+
+        A folder that starts with '.' is an 'archive'
+        not indended to be searchable in this CLI app.
         """
 
         exclude: tuple[str, ...] = (".",)
+        # exclude: tuple[str, ...] = (" ",)
 
         is_in_base = filepath.parent.name == self.base_name
         is_folder = filepath.is_dir()
@@ -69,7 +77,7 @@ class GroupsManager:
         is_valid = is_in_base and is_folder and not is_rejected_prefix
         return is_valid
 
-    def order_groups(self, groups: list[str]) -> list[str]:
+    def _order_groups(self, groups: list[str]) -> list[str]:
         groups.remove("main")
         groups.remove("playground")
 
@@ -97,7 +105,7 @@ class GroupsManager:
     def __init__(self) -> None:
         groups = self._list_groups()
 
-        self.groups: list[str] = self.order_groups(groups)
+        self.groups: list[str] = self._order_groups(groups)
         self.groups_paths = [PROJECTS_DIR / group for group in self.groups]
 
     def verify_group(self, group_candidate: str) -> None:
@@ -113,7 +121,7 @@ class GroupsManager:
             unique name
         """
 
-        if new_group in self.reserved_projects:
+        if new_group in self.reserved_groups:
             raise ValueError(f"'{new_group}' is reserved.")
 
         if new_group in self.groups:
@@ -122,8 +130,8 @@ class GroupsManager:
         return True
 
 
-class ProjectsManager(GroupsManager):
-    """Manager of all projects of all groups."""
+class ProjectManager(GroupManager):
+    """Manager of projects."""
 
     def is_project(self, filepath: Path) -> bool:
         """Whether this filepath is a project.
@@ -193,7 +201,6 @@ class ProjectsManager(GroupsManager):
             if show_non_temps:
                 # to_show: list[Path] = to_show + non_temp_project_paths
                 to_show += non_temp_project_paths
-                
 
         return to_show
 
@@ -224,7 +231,6 @@ class ProjectsManager(GroupsManager):
 
     def verify_project(self, project_candidate: str) -> None:
         """Raises an error if the input is not a valid project."""
-
         if project_candidate not in self.projects:
             raise ValueError(f"'{project_candidate}' is not a valid project.")
 
@@ -255,14 +261,12 @@ class ProjectsManager(GroupsManager):
 
         # Quick fix
         if new_project.startswith(temp_prefix):
-            raise Warning(
-                f"Initialisation failed. '{new_project}' classified as a temporary project, susceptible to easy deletion."
-            )
+            warnings.warn(f"'{new_project}' classified as a temporary project, susceptible to easy deletion.")
 
         return True
 
 
-class FileManager:
+class Project:
     """Manages files within a chosen project."""
 
     default_data_folder_names_map = {
@@ -277,8 +281,8 @@ class FileManager:
         this_project_path: Path,
         data_folder_names: list[str] = list(default_data_folder_names_map.values()),
     ) -> None:
-        self.this_project_path = this_project_path
-        self.data_folder_names = data_folder_names
+        self.this_project_path: Path = this_project_path
+        self.data_folder_names: list[str] = data_folder_names
 
         r = self.default_data_folder_names_map["raw"]
         i = self.default_data_folder_names_map["interim"]
@@ -311,12 +315,15 @@ class FileManager:
             }
         }
 
-        # Need to idenfify the location of the data dump
-        data_dump_folder: Tree = {
-            "data": {
-                f"{r}": {},
-            }
-        }
+        # Location of data dump
+        # data_dump_folder a subjset of data_folders_structure
+        data_dump_path: Path = self.this_project_path / "data" / r
+        data_external_path: Path = self.this_project_path / "data" / e
+        # data_dump_folder: Tree = {
+        #     "data": {
+        #         f"{r}": {},
+        #     }
+        # }
 
         db_folder_structure: Tree = {
             "data": {
@@ -339,24 +346,41 @@ class FileManager:
                 "figures": {},
             },
             "README.md": None,
+            ".locked": None,
         }
 
-        self.data_folders_structure = data_folders_structure
-        self.db_folder_structure = db_folder_structure
-        self.other_files_structure = other_files_structure
+        # The data source goes here
+        # sources_folder a subset of other_files_structure
+        # sources_path: Path = self.this_project_path / "referecnes" / "sources.txt"
+        # sources_folder: Tree = {
+        #     "references:": {
+        #         "sources.txt": None,
+        #     }
+        # }
+
+        self.data_folders_structure: Tree = data_folders_structure
+        self.db_folder_structure: Tree = db_folder_structure
+        self.other_files_structure: Tree = other_files_structure
+
+        # self.data_dump_folder = data_dump_folder
+        # self.sources_folder = sources_folder
+
+        self.data_dump_path: Path = data_dump_path
+        self.data_external_path: Path = data_external_path
 
     def mkdir_data_folders(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.data_folders_structure)
-        pass
 
     def mkdir_other_files(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.other_files_structure)
-        pass
 
-    def add_db(self) -> None:
+    def mkdir_db_folder(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.db_folder_structure)
-        pass
 
-
-class Project:
-    pm = ProjectsManager()
+    def handle_url(self, url: str) -> Path:
+        dispatcher = URLDispatcher()
+        return dispatcher.download(
+            url,
+            raw_path=self.data_dump_path,
+            external_path=self.data_external_path,
+        )

@@ -1,0 +1,34 @@
+Features I would like to add:
+
+dpx mv <project1> <project2> -g <group>
+    Move <project1> <project2> to <group> if group exists
+
+dpx lock <project>
+    Make <project> unable to be deleted in CLI app
+    (project_path / ".locked").touch()
+
+dpx unlock <project>
+    Make <project> able to be deleted in CLI app
+    (project_path / ".locked").unlink(missing_ok=True)
+
+dpx set current <group>
+    Set <group> as current group
+
+dpx get current group
+    Gets current group
+
+dpx create group <group>
+    Create a new group <group>
+
+dpx dls <project>
+    Lists data files in raw, interim, processed, external folders
+    Similar to: dpx ls --all
+
+dpx open <project>
+    ?
+
+dpx begin <project>
+    code path/to/project
+
+dpx find <project>
+    Finds the group the project belongs to

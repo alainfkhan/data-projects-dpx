@@ -8,20 +8,19 @@ cdb
 dpromote
 """
 
-import os
+from typing_extensions import Annotated
 
 import typer
 from icecream import ic
 from rich import print
-from typing_extensions import Annotated
 
-from src.dpx.cli.util import ProjectsManager, FileManager
+from src.dpx.cli.utils.util import ProjectManager, Project
+from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import (
     temp_prefix,
     copy_attachment,
     random_string,
 )
-from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
 
 doptions: list[str] = ["ripe", "metal"]
 # data folder name options
@@ -33,16 +32,60 @@ default_doption = "ripe"
 current_main = "main"
 
 app = typer.Typer()
-pm = ProjectsManager()
+# projects_manager = ProjectManager()
 
 
-# @app.command(help="Download a dataset to an existing project.")
-# def dl(
-#     name: Annotated[str, typer.Argument()],
-#     url: Annotated[str, typer.Argument()],
-#     playground: Annotated[bool, typer.Option()] = False,
-# ) -> None:
-#     pass
+@app.command(help="Download a dataset to an existing project.")
+def dl(
+    name: Annotated[
+        str,
+        typer.Argument(help="The name of the project."),
+    ],
+    url: Annotated[
+        str,
+        typer.Option(
+            "-u",
+            "--url",
+            help="The url source of the dataset.",
+        ),
+    ],
+    playground: Annotated[
+        bool,
+        typer.Option(
+            "-p",
+            "--playground",
+            help="Download to a project in playground.",
+        ),
+    ] = False,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--group",
+            help="The group of the project.",
+        ),
+    ] = current_main,
+) -> None:
+    # Case where url is necessary
+    # Maybe possible to download data not using url
+    if not url:
+        raise ValueError("Must have a url.")
+
+    # Necessary
+    projects_manager = ProjectManager()
+
+    projects_manager.verify_group(group)
+    projects_manager.verify_project(name)
+
+    if playground:
+        group = "playground"
+
+    this_project_path = PROJECTS_DIR / group / name
+
+    project = Project(this_project_path)
+
+    if url:
+        project.handle_url(url)
 
 
 # @app.command()
@@ -65,6 +108,7 @@ pm = ProjectsManager()
 
 @app.command(help="Initialise a project workspace in an existing project group.")
 def init(
+    *,
     name: Annotated[
         str,
         typer.Argument(
@@ -97,10 +141,7 @@ def init(
     ] = None,
     force: Annotated[
         bool,
-        typer.Option(
-            "-f",
-            "--force",
-        ),
+        typer.Option("-f", "--force", help="Force overwrite."),
     ] = False,
 ) -> None:
     """Initialises a workspace.
@@ -114,8 +155,10 @@ def init(
         in group <group>
     """
 
-    pm.verify_group(group)
-    if not pm.can_create_project(name):
+    project_manager = ProjectManager()
+    project_manager.verify_group(group)
+
+    if not project_manager.can_create_project(name):
         raise ValueError(f"Project '{name}' cannot be created.")
 
     if playground:
@@ -125,13 +168,21 @@ def init(
     this_project_path.mkdir(exist_ok=True)
 
     # make data folders
-    fm = FileManager(this_project_path)
-    fm.mkdir_data_folders()
+    project = Project(this_project_path)
+    project.mkdir_data_folders()
 
     # make other init folders
-    fm.mkdir_other_files()
-
-    # if url valid download to data/raw
-    # add url to sources.txt
+    project.mkdir_other_files()
 
     print(f"Initialised new project: '{name}' in group: '{group}'.")
+
+    if not url:
+        return
+
+    # Dowload data using cli command
+    dl(
+        name=name,
+        url=url,
+        playground=playground,
+        group=group,
+    )
