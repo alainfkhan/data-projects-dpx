@@ -9,6 +9,7 @@ open
 """
 
 import os
+import subprocess
 from collections.abc import Callable
 from pathlib import Path
 from typing_extensions import Annotated
@@ -220,13 +221,41 @@ def dls(
 #     pass
 
 
-# @app.command()
-# def begin(
-#     name: Annotated[str, typer.Argument()],
-#     playground: Annotated[bool, typer.Option()],
-#     ide: Annotated[str, typer.Option] = ide,
-# ) -> None:
-#     pass
+@app.command()
+def begin(
+    name: Annotated[str, typer.Argument()],
+    playground: Annotated[
+        bool,
+        typer.Option(
+            "-p",
+            "--playground",
+            help="Choose playground.",
+        ),
+    ] = False,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--group",
+            help="The group of the project",
+        ),
+    ] = current_main,
+    ide: Annotated[str, typer.Option] = ide,
+) -> None:
+    """Begin working on the project by opening an IDE."""
+
+    project_manager = ProjectManager()
+
+    project_manager.verify_group(group)
+    project_manager.verify_project(name)
+
+    if playground:
+        group = "playground"
+
+    this_project_path = PROJECTS_DIR / group / name
+    # project = Project(this_project_path)
+
+    subprocess.run([ide, this_project_path])
 
 
 # @app.command()
