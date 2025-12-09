@@ -286,9 +286,11 @@ class Project:
         self,
         this_project_path: Path,
         data_folder_names: list[str] = list(default_data_folder_names_map.values()),
+        url: str | None = None,
     ) -> None:
         self.this_project_path: Path = this_project_path
         self.data_folder_names: list[str] = data_folder_names
+        self.url = url
 
         r = self.default_data_folder_names_map["raw"]
         i = self.default_data_folder_names_map["interim"]
@@ -356,7 +358,7 @@ class Project:
 
         # The data source goes here
         # sources_folder a subset of other_files_structure
-        # sources_path: Path = self.this_project_path / "referecnes" / "sources.txt"
+        sources_path: Path = self.this_project_path / "references" / "sources.txt"
         # sources_folder: Tree = {
         #     "references:": {
         #         "sources.txt": None,
@@ -375,6 +377,7 @@ class Project:
 
         self.data_dump_path: Path = data_dump_path
         self.data_external_path: Path = data_external_path
+        self.sources_path: Path = sources_path
 
     def is_locked(self) -> bool:
         """Checks if a project is locked.
@@ -417,6 +420,12 @@ class Project:
 
     def mkdir_db_folder(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.db_folder_structure)
+
+    def append_source(self, source: str) -> None:
+        """Append a source to sources.txt"""
+
+        with open(self.sources_path, "a") as f:
+            f.write(f"{source}")
 
     def handle_url(self, url: str) -> Path:
         dispatcher = URLDispatcher()

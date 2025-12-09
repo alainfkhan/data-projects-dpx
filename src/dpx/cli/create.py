@@ -86,6 +86,7 @@ def dl(
 
     if url:
         project.handle_url(url)
+        project.append_source(url)
 
 
 # @app.command()
