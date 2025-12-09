@@ -30,7 +30,10 @@ all         refers to all groups
 # from __future__ import annotations
 
 import os
+import shutil
 import warnings
+import time
+import threading
 from pathlib import Path
 
 from icecream import ic
@@ -275,6 +278,7 @@ class Project:
         "processed": "processed",
         "external": "external",
     }
+    default_unlock_wait_lock_seconds = 10
 
     def __init__(
         self,
@@ -346,7 +350,6 @@ class Project:
                 "figures": {},
             },
             "README.md": None,
-            ".locked": None,
         }
 
         # The data source goes here
@@ -358,6 +361,9 @@ class Project:
         #     }
         # }
 
+        self.name = this_project_path.name
+        self.group = this_project_path.parent.name
+
         self.data_folders_structure: Tree = data_folders_structure
         self.db_folder_structure: Tree = db_folder_structure
         self.other_files_structure: Tree = other_files_structure
@@ -367,6 +373,39 @@ class Project:
 
         self.data_dump_path: Path = data_dump_path
         self.data_external_path: Path = data_external_path
+
+    def is_locked(self) -> bool:
+        """Checks if a project is locked.
+
+        A project is locked iff:
+            contains a file: .locked in root
+        """
+
+        dirs = os.listdir(self.this_project_path)
+        if ".locked" in dirs:
+            return True
+
+        return False
+
+    def lock(self) -> None:
+        """Locks a project."""
+
+        if not self.is_locked():
+            (self.this_project_path / ".locked").touch()
+        return
+
+    def unlock(self) -> None:
+        """Unlocks a project."""
+
+        if self.is_locked():
+            os.remove(self.this_project_path / ".locked")
+        return
+
+    def unlock_wait_lock(self, seconds: int = default_unlock_wait_lock_seconds) -> None:
+        self.unlock()
+        # threading.Timer(seconds, self.lock).start()
+        time.sleep(seconds)
+        self.lock()
 
     def mkdir_data_folders(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.data_folders_structure)

@@ -174,6 +174,8 @@ def init(
     # make other init folders
     project.mkdir_other_files()
 
+    project.lock()
+
     print(f"Initialised new project: '{name}' in group: '{group}'.")
 
     if not url:
