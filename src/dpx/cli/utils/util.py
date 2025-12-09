@@ -36,7 +36,9 @@ import time
 import threading
 from pathlib import Path
 
+import pandas as pd
 from icecream import ic
+from pandas import DataFrame
 
 from src.dpx.cli.utils.url_manager import URLDispatcher
 from src.dpx.utils.paths import PROJECTS_DIR
@@ -423,3 +425,18 @@ class Project:
             raw_path=self.data_dump_path,
             external_path=self.data_external_path,
         )
+
+    def data_ls(self) -> DataFrame:
+        """View the data filenames in this project."""
+
+        df = pd.DataFrame()
+        for f in self.data_folder_names:
+            data_folder_path = self.this_project_path / "data" / f
+            data_files = os.listdir(data_folder_path)
+
+            df_concat = pd.DataFrame(
+                data_files,
+                columns=[f],
+            )
+            df = pd.concat([df, df_concat], axis=1)
+        return df

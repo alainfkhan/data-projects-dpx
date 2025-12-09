@@ -21,7 +21,7 @@ from rich import print
 from rich.console import Console
 from rich.table import Table
 
-from src.dpx.cli.utils.util import ProjectManager
+from src.dpx.cli.utils.util import Project, ProjectManager
 from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import df_to_table, temp_prefix
 
@@ -153,14 +153,53 @@ def gls(
     return
 
 
-# @app.command()
-# def dls(
-#     name: Annotated[str, typer.Argument()],
-#     playground: Annotated[bool, typer.Option()],
-#     ddir: Annotated[str, typer.Option()],
-#     ddirs: Annotated[list[str], typer.Option()],
-# ) -> None:
-#     pass
+@app.command()
+def dls(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The project name.",
+        ),
+    ],
+    playground: Annotated[
+        bool,
+        typer.Option(
+            "-p",
+            "--p",
+            help="Choose a project in playground.",
+        ),
+    ] = False,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--group",
+            help="Choose the group of the project.",
+        ),
+    ] = current_main,
+    # ddir: Annotated[str, typer.Option()],
+    # ddirs: Annotated[list[str], typer.Option()],
+) -> None:
+    this_project_path = PROJECTS_DIR / group / name
+    project_manager = ProjectManager()
+
+    project_manager.verify_group(group)
+    project_manager.verify_project(name)
+
+    project = Project(this_project_path)
+
+    df = project.data_ls()
+
+    for col in df.columns:
+        df.rename(columns={col: f"[{df[col].notna().sum()}] {col}/"}, inplace=True)
+
+    df.fillna("", inplace=True)
+
+    table: Table = df_to_table(df)
+    # table.title = f"{name}/data/"
+
+    console = Console()
+    console.print(table)
 
 
 # @app.command()
