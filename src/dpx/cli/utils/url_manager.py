@@ -21,12 +21,18 @@ class KaggleHandler:
     def can_handle(self, url: str) -> bool:
         return "kaggle.com" in url
 
-    def download(self, url: str, *, raw_path: Path, external_path: Path) -> Path:
+    def get_handle_from_url(self, url: str) -> str:
         parsed_url = urlparse(url)
 
-        # TODO: clean include url query
-        handle = parsed_url.path.removeprefix("/datasets/").removesuffix("/data")
+        path_part = parsed_url.path.removeprefix("/datasets/").split("/")[0:2]
+        handle = f"{path_part[0]}/{path_part[1]}"
 
+        return handle
+
+    def download(self, url: str, *, raw_path: Path, external_path: Path) -> Path:
+        """"""
+
+        handle = self.get_handle_from_url(url)
         kaggle.api.authenticate()
 
         try:
