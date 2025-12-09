@@ -98,3 +98,15 @@ def create_structure(base_path: Path, tree: Tree) -> None:
         else:
             folder_path.mkdir(parents=True, exist_ok=True)
             create_structure(base_path=folder_path, tree=subtree)
+
+
+def find_dirs_with_name(name: str, dir: Path) -> list[Path]:
+    """Finds the directories of the files with name in some directory."""
+
+    output: list[Path] = []
+    pattern: str = f"*{name}*"
+
+    for f in dir.rglob(pattern):
+        output.append(f)
+
+    return output

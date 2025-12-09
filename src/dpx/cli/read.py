@@ -154,7 +154,7 @@ def gls(
     return
 
 
-@app.command()
+@app.command(help="List datafiles in a project.")
 def dls(
     name: Annotated[
         str,
@@ -181,6 +181,9 @@ def dls(
     # ddir: Annotated[str, typer.Option()],
     # ddirs: Annotated[list[str], typer.Option()],
 ) -> None:
+    if playground:
+        group = "playground"
+
     this_project_path = PROJECTS_DIR / group / name
     project_manager = ProjectManager()
 

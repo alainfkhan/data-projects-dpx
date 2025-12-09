@@ -121,6 +121,7 @@ class GroupManager:
 
     def can_create_group(self, new_group: str) -> bool:
         """Checks whether a group with this name can be created.
+
         Can create new group iff
             name not main nor playground
             unique name
@@ -250,6 +251,7 @@ class ProjectManager(GroupManager):
 
     def can_create_project(self, new_project: str) -> bool:
         """Checks whether a project with this name can be created.
+
         Can create new project iff
             unique name
             not temp type

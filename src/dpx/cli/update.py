@@ -8,14 +8,17 @@ demote
 mv
 """
 
+import os
 from typing_extensions import Annotated
 from pathlib import Path
 
-from rich import print
 import typer
+from icecream import ic
+from rich import print
 
 from src.dpx.cli.utils.util import Project, ProjectManager
 from src.dpx.utils.paths import PROJECTS_DIR
+from src.dpx.utils.util import find_dirs_with_name
 
 app = typer.Typer()
 current_main = "main"
@@ -111,12 +114,64 @@ def lock(
             print(f"Locked '{project.name}' in '{project.group}'.")
 
 
-# @app.command()
-# def rename(
-#     name_to_new: Annotated[str, typer.Argument()],
-#     playground: Annotated[bool, typer.Option()] = False,
-# ) -> None:
-#     pass
+@app.command()
+def rename(
+    name_to_new: Annotated[
+        list[str],
+        typer.Argument(
+            help="From name to new name",
+        ),
+    ],
+    playground: Annotated[
+        bool,
+        typer.Option(
+            "-p",
+            "--playground",
+            help="Rename a project in playground.",
+        ),
+    ] = False,
+    group: Annotated[
+        str,
+        typer.Option(
+            "-g",
+            "--group",
+            help="Rename a project in group.",
+        ),
+    ] = current_main,
+) -> None:
+    """Rename an existing project including all sub files with the same name."""
+
+    if len(name_to_new) != 2:
+        raise ValueError("Must have exactly two entries.")
+
+    old_name = name_to_new[0]
+    new_name = name_to_new[1]
+
+    project_manager = ProjectManager()
+    project_manager.verify_group(group)
+    project_manager.verify_project(old_name)
+    project_manager.can_create_project(new_name)
+
+    if playground:
+        group = "playground"
+
+    this_old_project_path = PROJECTS_DIR / group / old_name
+
+    if not this_old_project_path.exists():
+        print(f"'{old_name}' is not in '{group}'")
+        return
+
+    dirs: list[Path] = find_dirs_with_name(old_name, this_old_project_path)
+    dirs.append(this_old_project_path)
+
+    for dir in dirs:
+        old_dir_name = dir
+        new_dir_name = dir.parent / dir.name.replace(old_name, new_name)
+
+        try:
+            os.rename(old_dir_name, new_dir_name)
+        except Exception as e:
+            print(e)
 
 
 # @app.command()

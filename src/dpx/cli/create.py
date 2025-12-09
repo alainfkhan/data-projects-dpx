@@ -81,7 +81,6 @@ def dl(
         group = "playground"
 
     this_project_path = PROJECTS_DIR / group / name
-
     project = Project(this_project_path)
 
     if url:
