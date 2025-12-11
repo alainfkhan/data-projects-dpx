@@ -9,6 +9,7 @@ mv
 """
 
 import os
+import shutil
 from typing_extensions import Annotated
 from pathlib import Path
 
@@ -199,6 +200,67 @@ def rename(
 #     pass
 
 
-# @app.command()
-# def mv(name: Annotated[str, typer.Argument()]) -> None:
-#     pass
+@app.command(help="Move a file from one group to another group.")
+def mv(
+    names: Annotated[
+        list[str],
+        typer.Argument(
+            help="The name of the project(s).",
+        ),
+    ],
+    to_group: Annotated[
+        str,
+        typer.Option(
+            "-to",
+            help="Move the file to this group.",
+        ),
+    ],
+    # playground: Annotated[
+    #     bool,
+    #     typer.Option(
+    #         "-p",
+    #         "--playground",
+    #         help="Choose the playground group.",
+    #     ),
+    # ] = False,
+    # group: Annotated[
+    #     str,
+    #     typer.Option(
+    #         "-g",
+    #         "--group",
+    #         help="The name of the group.",
+    #     ),
+    # ] = current_main,
+) -> None:
+    project_manager = ProjectManager()
+    project_manager.verify_group(to_group)
+
+    moved: list[str] = []
+    not_moved: list[str] = []
+    for name in names:
+        project_manager.verify_project(name)
+
+        group = project_manager.get_group_from_project(name)
+        if group == to_group:
+            not_moved.append(name)
+            continue
+
+        src = PROJECTS_DIR / group / name
+        dst = PROJECTS_DIR / to_group / name
+        shutil.move(src, dst)
+
+        moved.append(name)
+
+    if moved:
+        print("Moved project(s):", end=" ")
+        for m in moved:
+            print(f"'{m}'", end=", ")
+        print(f"to '{to_group}'.")
+
+    if not_moved:
+        print("Project(s):", end=" ")
+        for n in not_moved:
+            print(f"'{n}'", end=", ")
+        print(f"is already in '{to_group}'.")
+
+    pass
