@@ -2,11 +2,13 @@
 Util functions that could be used in other programs.
 """
 
-import string
+import os
 import random
+import string
 from typing import Dict
 
 import nbformat as nbf
+import pandas as pd
 from icecream import ic
 from nbformat import NotebookNode
 from pandas import DataFrame, Series
@@ -29,6 +31,7 @@ type Tree = dict[str, None | Tree]
 
 def random_string(length: int = random_string_length) -> str:
     """Generate any random string."""
+
     characters: str = string.ascii_lowercase + string.digits
 
     output: str = ""
@@ -38,8 +41,19 @@ def random_string(length: int = random_string_length) -> str:
     return output
 
 
-# def csv_to_excel(csv_file: Path) -> None:
-#     pass
+def csv_to_excel(csv_file: Path) -> Path:
+    """Converts a .csv to an .xlsx within the same dir.
+    Returns the path of the .xlsx file
+    """
+
+    stem, _ = os.path.splitext(csv_file.name)
+    xlsx_filename: str = f"{stem}.xlsx"
+    xlsx_path = csv_file.parent / xlsx_filename
+
+    df = pd.read_csv(csv_file)
+    df.to_excel(xlsx_path, index=False)
+
+    return xlsx_path
 
 
 def df_to_table(df: DataFrame) -> Table:

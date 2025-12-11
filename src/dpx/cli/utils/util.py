@@ -39,6 +39,7 @@ from pathlib import Path
 import pandas as pd
 from icecream import ic
 from pandas import DataFrame
+from rich import print
 
 from src.dpx.cli.utils.url_manager import URLDispatcher
 from src.dpx.utils.paths import PROJECTS_DIR
@@ -47,6 +48,25 @@ from src.dpx.utils.util import Tree, create_structure
 # Custom definitions
 temp_prefix = "~"
 current_main = "main"
+
+copy_appendage = "-copy"
+# what to append to a copy
+# eg file.ext -> file-copy.ext
+# file-copy.ext -> file-copy-copy.ext
+"""
+TODO: 
+file.ext -> file(1).ext
+file(1).ext -> file(2).ext
+
+if in a file, there exists:
+    file.ext
+    file(1).ext
+    file(3).ext
+
+and file(1).ext, file(3).ext are copies of file.ext
+another copy of file.ext -> file(4).ext   
+"""
+
 
 # type Tree = dict[str, None | Tree]
 
@@ -290,15 +310,6 @@ class Project:
         data_folder_names: list[str] = list(default_data_folder_names_map.values()),
         url: str | None = None,
     ) -> None:
-        self.this_project_path: Path = this_project_path
-        self.data_folder_names: list[str] = data_folder_names
-        self.url = url
-
-        r = self.default_data_folder_names_map["raw"]
-        i = self.default_data_folder_names_map["interim"]
-        p = self.default_data_folder_names_map["processed"]
-        e = self.default_data_folder_names_map["external"]
-
         """Structure rules:
         folder:
             key = "name"
@@ -309,12 +320,21 @@ class Project:
             key = "name.ext"
             ends in .ext
             has value None
-            
+
         Known files:
             .txt, .md
             .ipynb
-        
+
         """
+        self.this_project_path: Path = this_project_path
+        self.data_folder_names: list[str] = data_folder_names
+        self.url = url
+
+        r = self.default_data_folder_names_map["raw"]
+        i = self.default_data_folder_names_map["interim"]
+        p = self.default_data_folder_names_map["processed"]
+        e = self.default_data_folder_names_map["external"]
+
         # Plans to separate structures to be inputs in config
         data_folders_structure: Tree = {
             "data": {
@@ -328,6 +348,7 @@ class Project:
         # Location of data dump
         # data_dump_folder a subjset of data_folders_structure
         data_dump_path: Path = self.this_project_path / "data" / r
+        data_interim_path: Path = self.this_project_path / "data" / i
         data_external_path: Path = self.this_project_path / "data" / e
         # data_dump_folder: Tree = {
         #     "data": {
@@ -378,6 +399,7 @@ class Project:
         # self.sources_folder = sources_folder
 
         self.data_dump_path: Path = data_dump_path
+        self.data_interim_path: Path = data_interim_path
         self.data_external_path: Path = data_external_path
         self.sources_path: Path = sources_path
 
@@ -443,6 +465,10 @@ class Project:
         df = pd.DataFrame()
         for f in self.data_folder_names:
             data_folder_path = self.this_project_path / "data" / f
+
+            if not data_folder_path.exists():
+                data_folder_path.mkdir(parents=True, exist_ok=True)
+
             data_files = os.listdir(data_folder_path)
 
             df_concat = pd.DataFrame(
@@ -451,3 +477,36 @@ class Project:
             )
             df = pd.concat([df, df_concat], axis=1)
         return df
+
+    def data_copy(self, overwrite: bool = False) -> list[Path]:
+        """Copies all files from raw to interim.
+        Force is force overwrite.
+
+        Returns list of succefully created copies.
+        """
+
+        self.data_interim_path.mkdir(parents=True, exist_ok=True)
+
+        raw_files = os.listdir(self.data_dump_path)
+        # raw_file_paths = [self.data_dump_path / raw_file for raw_file in raw_files]
+
+        created_copies: list[Path] = []
+        for raw_filename in raw_files:
+            stem, ext = os.path.splitext(raw_filename)
+            new_stem = stem + copy_appendage
+            new_raw_filename = new_stem + ext
+
+            src = self.data_dump_path / raw_filename
+            dst = self.data_interim_path / new_raw_filename
+
+            if dst.exists():
+                if not overwrite:
+                    continue
+
+            shutil.copyfile(src, dst)
+            created_copies.append(dst)
+
+        return created_copies
+
+    def data_promote(self) -> None:
+        self.data_copy()

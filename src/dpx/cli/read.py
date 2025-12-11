@@ -14,8 +14,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing_extensions import Annotated
 
-import typer
 import pandas as pd
+import typer
 from icecream import ic
 from pandas import DataFrame
 from rich import print
@@ -33,7 +33,7 @@ current_main = "main"
 app = typer.Typer()
 
 
-@app.command(help="List project(s).")
+@app.command(help="List project(s) in group(s).")
 def ls(
     groups: Annotated[
         list[str],
@@ -200,7 +200,7 @@ def dls(
     df.fillna("", inplace=True)
 
     table: Table = df_to_table(df)
-    # table.title = f"{name}/data/"
+    table.title = f"{name}/data/"
 
     console = Console()
     console.print(table)
