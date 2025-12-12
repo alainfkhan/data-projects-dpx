@@ -55,7 +55,7 @@ def ls(
             "--all",
             help="List projects from all groups.",
         ),
-    ] = False,
+    ] = True,
     temps: Annotated[
         bool,
         typer.Option(
@@ -170,26 +170,26 @@ def dls(
             help="Choose a project in playground.",
         ),
     ] = False,
-    group: Annotated[
-        str,
-        typer.Option(
-            "-g",
-            "--group",
-            help="Choose the group of the project.",
-        ),
-    ] = current_main,
+    # group: Annotated[
+    #     str,
+    #     typer.Option(
+    #         "-g",
+    #         "--group",
+    #         help="Choose the group of the project.",
+    #     ),
+    # ] = current_main,
     # ddir: Annotated[str, typer.Option()],
     # ddirs: Annotated[list[str], typer.Option()],
 ) -> None:
     if playground:
         group = "playground"
 
-    this_project_path = PROJECTS_DIR / group / name
     project_manager = ProjectManager()
 
-    project_manager.verify_group(group)
     project_manager.verify_project(name)
+    group = project_manager.get_group_from_project(name)
 
+    this_project_path = PROJECTS_DIR / group / name
     project = Project(this_project_path)
 
     df = project.data_ls()
@@ -200,7 +200,7 @@ def dls(
     df.fillna("", inplace=True)
 
     table: Table = df_to_table(df)
-    table.title = f"{name}/data/"
+    table.title = f"{group}/{name}/data/"
 
     console = Console()
     console.print(table)

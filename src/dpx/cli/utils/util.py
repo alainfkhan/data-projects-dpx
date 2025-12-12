@@ -326,6 +326,7 @@ class Project:
             .ipynb
 
         """
+
         self.this_project_path: Path = this_project_path
         self.data_folder_names: list[str] = data_folder_names
         self.url = url
@@ -466,8 +467,8 @@ class Project:
         for f in self.data_folder_names:
             data_folder_path = self.this_project_path / "data" / f
 
-            if not data_folder_path.exists():
-                data_folder_path.mkdir(parents=True, exist_ok=True)
+            # if not data_folder_path.exists():
+            #     data_folder_path.mkdir(parents=True, exist_ok=True)
 
             data_files = os.listdir(data_folder_path)
 

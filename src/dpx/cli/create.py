@@ -287,6 +287,10 @@ def init(
         in group <group>
     """
 
+    def end_message() -> None:
+        print(f"Initialised new project: '{name}' in group: '{group}'.")
+        pass
+
     project_manager = ProjectManager()
     project_manager.verify_group(group)
 
@@ -308,12 +312,12 @@ def init(
 
     project.lock()
 
-    print(f"Initialised new project: '{name}' in group: '{group}'.")
-
     if not url:
+        end_message()
         return
 
     # Dowload data using cli command
+    print("Downloading files from URL...")
     dl(
         name=name,
         url=url,
@@ -321,9 +325,12 @@ def init(
         group=group,
     )
 
+    print("Initialising downloaded files...")
     dpromote(
         name=name,
         playground=playground,
         group=group,
         force_overwrite=force_overwrite,
     )
+
+    end_message()

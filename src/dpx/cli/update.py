@@ -252,13 +252,13 @@ def mv(
         moved.append(name)
 
     if moved:
-        print("Moved project(s):", end=" ")
+        print("Moved projects:", end=" ")
         for m in moved:
             print(f"'{m}'", end=", ")
         print(f"to '{to_group}'.")
 
     if not_moved:
-        print("Project(s):", end=" ")
+        print("Projects:", end=" ")
         for n in not_moved:
             print(f"'{n}'", end=", ")
         print(f"is already in '{to_group}'.")
