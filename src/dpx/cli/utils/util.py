@@ -151,9 +151,15 @@ class GroupManager:
             raise ValueError(f"'{new_group}' is reserved.")
 
         if new_group in self.groups:
-            raise FileExistsError(f"'{new_group}' already exists.")
+            raise FileExistsError(f"Group: '{new_group}' already exists.")
 
         return True
+
+    def create_group(self, group_name: str) -> None:
+        self.can_create_group(group_name)
+        (self.base_path / group_name).mkdir()
+
+        pass
 
 
 class ProjectManager(GroupManager):

@@ -40,6 +40,17 @@ app = typer.Typer()
 # projects_manager = ProjectManager()
 
 
+@app.command(help="Create a new group.")
+def group(
+    group: Annotated[
+        str,
+        typer.Argument(help="The name of the group you want to create."),
+    ],
+) -> None:
+    project_manager = ProjectManager()
+    project_manager.create_group(group)
+
+
 @app.command(help="Download a dataset to an existing project.")
 def dl(
     name: Annotated[

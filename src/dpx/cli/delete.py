@@ -5,6 +5,7 @@ TODO: rm moves a project to trash, until deletion some days later
 rm
 """
 
+import os
 import shutil
 import threading
 from pathlib import Path
@@ -23,7 +24,7 @@ wait_to_unlock: int = 10
 
 
 @app.command(help="Delete project(s).")
-def rm(
+def project(
     names: Annotated[
         list[str] | None,
         typer.Argument(
@@ -155,3 +156,15 @@ def rm(
     #             f"Could not find project: '{name}' in {'any group' if search_all_groups else f"group: '{group}'"}."
     #         )
     #     to_remove.append(PROJECTS_DIR / group / name)
+
+
+@app.command()
+def group(group: Annotated[str, typer.Argument()]) -> None:
+    project_manager = ProjectManager()
+
+    projects_in_group = project_manager.list_projects([group])
+    if projects_in_group:
+        print(f"Cannot delete group: '{group}'. Empty first.")
+    else:
+        os.rmdir(PROJECTS_DIR / group)
+        print(f"Deleted group: '{group}'.")
