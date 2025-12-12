@@ -150,8 +150,35 @@ class GroupManager:
         if new_group in self.reserved_groups:
             raise ValueError(f"'{new_group}' is reserved.")
 
+        if new_group.startswith("."):
+            raise ValueError("Cannot create an archive.")
+
         if new_group in self.groups:
             raise FileExistsError(f"Group: '{new_group}' already exists.")
+
+        return True
+
+    def can_delete_group(self, group_name: str) -> bool:
+        """Checks whether a group with this name can be delete.
+
+        Can delete existing group iff
+            is group
+            name not reserved
+            contains no projects <= is empty
+        """
+        reserved: list[str] = []
+        reserved += self.reserved_groups
+        reserved += self.reserved_archives
+
+        if group_name not in self.groups:
+            raise ValueError("Not a valid group.")
+
+        if group_name in reserved:
+            raise ValueError("Action forbidden: cannot delete something reserved.")
+
+        files_in_group = os.listdir(PROJECTS_DIR / group_name)
+        if files_in_group:
+            raise ValueError("Cannot delete a filled group. Must empty first.")
 
         return True
 

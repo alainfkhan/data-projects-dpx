@@ -159,12 +159,18 @@ def project(
 
 
 @app.command()
-def group(group: Annotated[str, typer.Argument()]) -> None:
+def group(
+    group: Annotated[
+        str,
+        typer.Argument(
+            help="Name of group you want to delete.",
+        ),
+    ],
+) -> None:
     project_manager = ProjectManager()
 
-    projects_in_group = project_manager.list_projects([group])
-    if projects_in_group:
-        print(f"Cannot delete group: '{group}'. Empty first.")
-    else:
+    if project_manager.can_delete_group(group):
         os.rmdir(PROJECTS_DIR / group)
         print(f"Deleted group: '{group}'.")
+    else:
+        print(f"Cannot delete group: '{group}'. Empty first.")
