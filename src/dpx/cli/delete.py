@@ -24,7 +24,7 @@ wait_to_unlock: int = 10
 
 
 @app.command(help="Delete project(s).")
-def project(
+def rm(
     names: Annotated[
         list[str] | None,
         typer.Argument(
@@ -53,7 +53,7 @@ def project(
             "--all",
             help="Search in all groups.",
         ),
-    ] = False,
+    ] = True,
     temps: Annotated[
         bool,
         typer.Option(
@@ -159,7 +159,7 @@ def project(
 
 
 @app.command()
-def group(
+def grm(
     group: Annotated[
         str,
         typer.Argument(

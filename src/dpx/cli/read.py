@@ -206,6 +206,22 @@ def dls(
     console.print(table)
 
 
+@app.command(help="Find the project path.")
+def where(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the project.",
+        ),
+    ],
+) -> None:
+    project_manager = ProjectManager()
+    project_path = project_manager.get_project_path(name)
+
+    if project_path.exists():
+        print(project_path)
+
+
 # @app.command()
 # def head(
 #     name: Annotated[str, typer.Argument()],

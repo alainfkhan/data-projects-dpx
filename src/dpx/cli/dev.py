@@ -1,3 +1,5 @@
+import os
+import subprocess
 import typer
 from typing import Annotated
 
@@ -5,7 +7,7 @@ from icecream import ic
 
 from src.dpx.cli.utils.util import Project, ProjectManager
 from src.dpx.cli.utils.url_manager import URLDispatcher, KaggleHandler
-from src.dpx.utils.paths import PROJECTS_DIR
+from src.dpx.utils.paths import PROJECTS_DIR, DPX_DIR
 
 app = typer.Typer()
 
@@ -47,6 +49,25 @@ def finalxl(name: Annotated[str, typer.Argument(help="The name of the project.")
     project = Project(this_project_path)
 
     project.add_final_excel_file()
+
+
+@app.command(help="Change directory to a project.")
+def cd(
+    name: Annotated[str | None, typer.Argument()] = None,
+) -> None:
+    project_manager = ProjectManager()
+
+    ic(name)
+    if name is None:
+        goto = DPX_DIR
+        ic(goto)
+    else:
+        group = project_manager.get_group_from_project(name)
+        goto = PROJECTS_DIR / group / name
+        ic(goto)
+
+    # subprocess.run(["cd", goto])
+    os.chdir(goto)
 
 
 @app.command()

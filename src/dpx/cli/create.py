@@ -41,7 +41,7 @@ app = typer.Typer()
 
 
 @app.command(help="Create a new group.")
-def group(
+def add(
     group: Annotated[
         str,
         typer.Argument(help="The name of the group you want to create."),

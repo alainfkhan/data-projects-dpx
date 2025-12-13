@@ -31,25 +31,28 @@ def unlock(
         list[str] | None,
         typer.Argument(help="The name of the project you want to unlock."),
     ] = None,
-    playground: Annotated[
-        bool,
-        typer.Option("-p", "--playground", help="Unlock a project in playground."),
-    ] = False,
-    group: Annotated[
-        str,
-        typer.Option("-g", "--group", help="The group the project lives."),
-    ] = current_main,
+    # playground: Annotated[
+    #     bool,
+    #     typer.Option("-p", "--playground", help="Unlock a project in playground."),
+    # ] = False,
+    # group: Annotated[
+    #     str,
+    #     typer.Option("-g", "--group", help="The group the project lives."),
+    # ] = current_main,
 ) -> None:
     """Want to add resistance deleting a project."""
 
     if names is None:
         raise ValueError("Requires at least one project.")
 
-    if playground:
-        group = "playground"
+    # if playground:
+    #     group = "playground"
+    project_manager = ProjectManager()
 
     for name in names:
-        this_project_path = PROJECTS_DIR / group / name
+        group = project_manager.get_group_from_project(name)
+        this_project_path = project_manager.get_project_path(name)
+        # this_project_path = PROJECTS_DIR / group / name
         if this_project_path.exists():
             project = Project(this_project_path)
         else:
@@ -69,14 +72,14 @@ def lock(
         list[str] | None,
         typer.Argument(help="The name of the project you want to lock."),
     ] = None,
-    playground: Annotated[
-        bool,
-        typer.Option("-p", "--playground", help="Lock a project in playground."),
-    ] = False,
-    group: Annotated[
-        str,
-        typer.Option("-g", "--group", help="The group the project lives."),
-    ] = current_main,
+    # playground: Annotated[
+    #     bool,
+    #     typer.Option("-p", "--playground", help="Lock a project in playground."),
+    # ] = False,
+    # group: Annotated[
+    #     str,
+    #     typer.Option("-g", "--group", help="The group the project lives."),
+    # ] = current_main,
     lock_all: Annotated[
         bool,
         typer.Option(
@@ -85,9 +88,11 @@ def lock(
         ),
     ] = False,
 ) -> None:
+    project_manager = ProjectManager()
+
     if lock_all:
-        project_manager = ProjectManager()
-        all_projects_paths = project_manager.list_projects_paths()
+        groups = project_manager.groups
+        all_projects_paths = project_manager.list_projects_paths(groups)
 
         for p in all_projects_paths:
             project = Project(p)
@@ -97,11 +102,12 @@ def lock(
     if names is None:
         raise ValueError("Requires at least one project.")
 
-    if playground:
-        group = "playground"
+    # if playground:
+    #     group = "playground"
 
     for name in names:
-        this_project_path = PROJECTS_DIR / group / name
+        group = project_manager.get_group_from_project(name)
+        this_project_path = project_manager.get_project_path(name)
         if this_project_path.exists():
             project = Project(this_project_path)
         else:
@@ -113,6 +119,23 @@ def lock(
         else:
             project.lock()
             print(f"Locked '{project.name}' in '{project.group}'.")
+
+
+@app.command()
+def islocked(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the project.",
+        ),
+    ],
+) -> None:
+    project_manager = ProjectManager()
+    project_manager.verify_project(name)
+
+    this_project_path = project_manager.get_project_path(name)
+    project = Project(this_project_path)
+    print(project.is_locked())
 
 
 @app.command()

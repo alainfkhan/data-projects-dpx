@@ -302,6 +302,10 @@ class ProjectManager(GroupManager):
 
         raise FileNotFoundError(f"Cannot find group from project: '{project}'.")
 
+    def get_project_path(self, name: str) -> Path:
+        group = self.get_group_from_project(name)
+        return PROJECTS_DIR / group / name
+
     def can_create_project(self, new_project: str) -> bool:
         """Checks whether a project with this name can be created.
 
