@@ -33,8 +33,20 @@ def clean() -> None:
 
     kaggle_handler = KaggleHandler()
     handle = kaggle_handler.get_handle_from_url(url)
-
     print(handle)
+
+
+@app.command(help="Add an empty excel file in data/processed/")
+def finalxl(name: Annotated[str, typer.Argument(help="The name of the project.")]) -> None:
+    project_manager = ProjectManager()
+    project_manager.verify_project(name)
+
+    group = project_manager.get_group_from_project(name)
+
+    this_project_path = PROJECTS_DIR / group / name
+    project = Project(this_project_path)
+
+    project.add_final_excel_file()
 
 
 @app.command()

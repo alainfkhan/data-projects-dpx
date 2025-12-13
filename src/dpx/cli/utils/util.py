@@ -383,6 +383,7 @@ class Project:
         # data_dump_folder a subjset of data_folders_structure
         data_dump_path: Path = self.this_project_path / "data" / r
         data_interim_path: Path = self.this_project_path / "data" / i
+        data_processed_path: Path = self.this_project_path / "data" / p
         data_external_path: Path = self.this_project_path / "data" / e
         # data_dump_folder: Tree = {
         #     "data": {
@@ -434,6 +435,7 @@ class Project:
 
         self.data_dump_path: Path = data_dump_path
         self.data_interim_path: Path = data_interim_path
+        self.data_processed_path: Path = data_processed_path
         self.data_external_path: Path = data_external_path
         self.sources_path: Path = sources_path
 
@@ -475,6 +477,18 @@ class Project:
 
     def mkdir_other_files(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.other_files_structure)
+
+    def add_final_excel_file(self, xl_name: str | None = None) -> None:
+        """Create an empty excel file in data/processed/"""
+
+        if xl_name is None:
+            xl_name = f"{self.name}.xlsx"
+
+        if ".xls" not in xl_name:
+            xl_name += ".xlsx"
+
+        df = pd.DataFrame()
+        df.to_excel(self.data_processed_path / xl_name, index=False)
 
     def mkdir_db_folder(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.db_folder_structure)

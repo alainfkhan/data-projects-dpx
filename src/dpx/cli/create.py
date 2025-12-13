@@ -211,7 +211,7 @@ def dpromote(
         force_overwrite=force_overwrite,
     )
 
-    # Turn all .csv to xlsx files
+    # Turn all .csv in raw to .xlsx in interim
     interim_files = os.listdir(project.data_interim_path)
     interim_file_paths = [project.data_interim_path / interim_file for interim_file in interim_files]
 
@@ -343,5 +343,7 @@ def init(
         group=group,
         force_overwrite=force_overwrite,
     )
+
+    project.add_final_excel_file()
 
     end_message()
