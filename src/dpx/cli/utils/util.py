@@ -482,17 +482,21 @@ class Project:
     def mkdir_other_files(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.other_files_structure)
 
-    def add_final_excel_file(self, xl_name: str | None = None) -> None:
+    def add_final_excel_file(self, excel_name: str | None = None) -> Path:
         """Create an empty excel file in data/processed/"""
 
-        if xl_name is None:
-            xl_name = f"{self.name}.xlsx"
+        if excel_name is None:
+            excel_name = f"{self.name}.xlsx"
 
-        if ".xls" not in xl_name:
-            xl_name += ".xlsx"
+        if ".xls" not in excel_name:
+            excel_name += ".xlsx"
+
+        final_xl_path = self.data_processed_path / excel_name
 
         df = pd.DataFrame()
-        df.to_excel(self.data_processed_path / xl_name, index=False)
+        df.to_excel(final_xl_path, index=False)
+
+        return final_xl_path
 
     def mkdir_db_folder(self) -> None:
         create_structure(base_path=self.this_project_path, tree=self.db_folder_structure)
@@ -501,7 +505,12 @@ class Project:
         """Append a source to sources.txt"""
 
         with open(self.sources_path, "a") as f:
-            f.write(f"{source}")
+            f.write(f"{source}\n")
+
+    def get_sources(self) -> str:
+        with open(self.sources_path, "r") as f:
+            out = f.read()
+        return out
 
     def handle_url(self, url: str) -> Path:
         dispatcher = URLDispatcher()
@@ -545,10 +554,21 @@ class Project:
         created_copies: list[Path] = []
         for raw_filename in raw_files:
             stem, ext = os.path.splitext(raw_filename)
+
+            if ext in [".zip"]:
+                print(f"Not copying: '{raw_filename}'.")
+                continue
+
             new_stem = stem + copy_appendage
             new_raw_filename = new_stem + ext
 
             src = self.data_dump_path / raw_filename
+
+            if src.is_dir():
+                # TODO: copy all files in this dir
+                print(f"Cannot copy folder '{raw_filename}' now.")
+                continue
+
             dst = self.data_interim_path / new_raw_filename
 
             if dst.exists():

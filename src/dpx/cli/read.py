@@ -154,7 +154,7 @@ def gls(
     return
 
 
-@app.command(help="List datafiles in a project.")
+@app.command(help="List data files in a project.")
 def dls(
     name: Annotated[
         str,
@@ -162,14 +162,14 @@ def dls(
             help="The project name.",
         ),
     ],
-    playground: Annotated[
-        bool,
-        typer.Option(
-            "-p",
-            "--p",
-            help="Choose a project in playground.",
-        ),
-    ] = False,
+    # playground: Annotated[
+    #     bool,
+    #     typer.Option(
+    #         "-p",
+    #         "--p",
+    #         help="Choose a project in playground.",
+    #     ),
+    # ] = False,
     # group: Annotated[
     #     str,
     #     typer.Option(
@@ -181,8 +181,8 @@ def dls(
     # ddir: Annotated[str, typer.Option()],
     # ddirs: Annotated[list[str], typer.Option()],
 ) -> None:
-    if playground:
-        group = "playground"
+    # if playground:
+    #     group = "playground"
 
     project_manager = ProjectManager()
 
@@ -222,6 +222,22 @@ def where(
         print(project_path)
 
 
+@app.command(help="View the sources of a project.")
+def sources(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the project.",
+        ),
+    ],
+) -> None:
+    project_manager = ProjectManager()
+    project_manager.verify_project(name)
+
+    project = Project(project_manager.get_project_path(name))
+    print(project.get_sources().rstrip())
+
+
 # @app.command()
 # def head(
 #     name: Annotated[str, typer.Argument()],
@@ -243,35 +259,30 @@ def where(
 @app.command()
 def begin(
     name: Annotated[str, typer.Argument()],
-    playground: Annotated[
-        bool,
-        typer.Option(
-            "-p",
-            "--playground",
-            help="Choose playground.",
-        ),
-    ] = False,
-    group: Annotated[
-        str,
-        typer.Option(
-            "-g",
-            "--group",
-            help="The group of the project",
-        ),
-    ] = current_main,
-    ide: Annotated[str, typer.Option] = ide,
+    # playground: Annotated[
+    #     bool,
+    #     typer.Option(
+    #         "-p",
+    #         "--playground",
+    #         help="Choose playground.",
+    #     ),
+    # ] = False,
+    # group: Annotated[
+    #     str,
+    #     typer.Option(
+    #         "-g",
+    #         "--group",
+    #         help="The group of the project",
+    #     ),
+    # ] = current_main,
+    ide: Annotated[str, typer.Option()] = ide,
 ) -> None:
     """Begin working on the project by opening an IDE."""
 
     project_manager = ProjectManager()
 
-    project_manager.verify_group(group)
     project_manager.verify_project(name)
-
-    if playground:
-        group = "playground"
-
-    this_project_path = PROJECTS_DIR / group / name
+    this_project_path = project_manager.get_project_path(name)
     # project = Project(this_project_path)
 
     subprocess.run([ide, this_project_path])

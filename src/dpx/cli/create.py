@@ -7,6 +7,7 @@ cdb
 """
 
 import os
+import warnings
 from typing_extensions import Annotated
 
 import typer
@@ -41,7 +42,7 @@ app = typer.Typer()
 
 
 @app.command(help="Create a new group.")
-def add(
+def gadd(
     group: Annotated[
         str,
         typer.Argument(help="The name of the group you want to create."),
@@ -102,7 +103,7 @@ def dl(
         project.append_source(url)
 
 
-@app.command()
+@app.command(help="Copies all data in raw to interim in a project.")
 def dcp(
     name: Annotated[
         str,
@@ -153,7 +154,7 @@ def dcp(
         print(f"'{created_copy.name}' created in '{created_copy.parent.parent.name}/{created_copy.parent.name}'")
         return
 
-    print("Copied files already exist. No files overwritten.")
+    warnings.warn("No files copied.")
 
 
 @app.command(help="Initialise raw files.")
@@ -323,6 +324,8 @@ def init(
 
     project.lock()
 
+    project.add_final_excel_file()
+
     if not url:
         end_message()
         return
@@ -343,7 +346,5 @@ def init(
         group=group,
         force_overwrite=force_overwrite,
     )
-
-    project.add_final_excel_file()
 
     end_message()

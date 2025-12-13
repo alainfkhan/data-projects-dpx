@@ -198,6 +198,39 @@ def rename(
             print(e)
 
 
+@app.command()
+def add_sources(
+    things: Annotated[
+        list[str],
+        typer.Argument(
+            help="The source you want to append to the projects's sources.txt",
+        ),
+    ],
+    name: Annotated[
+        str,
+        typer.Option(
+            "-n",
+            "--name",
+            help="The name of the project.",
+        ),
+    ],
+) -> None:
+    """Appends sources to the sources.txt
+
+    dpx add-sources url1 url2 -n smith-somedataset
+        Appends url1, url2 to the sources folder in project: smith-somedataset
+
+
+    """
+    project_manager = ProjectManager()
+    project_manager.verify_project(name)
+
+    project = Project(project_manager.get_project_path(name))
+
+    for t in things:
+        project.append_source(t)
+
+
 # @app.command()
 # def drename(
 #     name: Annotated[str, typer.Argument("-n")],

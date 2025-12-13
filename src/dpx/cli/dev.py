@@ -38,8 +38,15 @@ def clean() -> None:
     print(handle)
 
 
-@app.command(help="Add an empty excel file in data/processed/")
-def finalxl(name: Annotated[str, typer.Argument(help="The name of the project.")]) -> None:
+@app.command(help="Create an empty excel file in data/processed/")
+def finalxl(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="The name of the project.",
+        ),
+    ],
+) -> None:
     project_manager = ProjectManager()
     project_manager.verify_project(name)
 
@@ -68,6 +75,11 @@ def cd(
 
     # subprocess.run(["cd", goto])
     os.chdir(goto)
+
+
+@app.command()
+def test_function(name: Annotated[str, typer.Argument()]) -> None:
+    print(f"hello {name}")
 
 
 @app.command()
