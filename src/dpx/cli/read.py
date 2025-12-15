@@ -9,6 +9,7 @@ open
 """
 
 import os
+import sys
 import subprocess
 from collections.abc import Callable
 from pathlib import Path
@@ -283,7 +284,9 @@ def begin(
 
     project_manager.verify_project(name)
     this_project_path = project_manager.get_project_path(name)
-    # project = Project(this_project_path)
+
+    if sys.platform == "win32":
+        ide = "code.cmd"
 
     subprocess.run([ide, this_project_path])
 
