@@ -374,12 +374,23 @@ class Project:
         e = self.default_data_folder_names_map["external"]
 
         # Plans to separate structures to be inputs in config
+        # add empty files to allow commits
+        data_ignore_file: str = ".gitkeep"
+        self.data_ignore_file = data_ignore_file
         data_folders_structure: Tree = {
             "data": {
-                f"{r}": {},
-                f"{i}": {},
-                f"{p}": {},
-                f"{e}": {},
+                f"{r}": {
+                    self.data_ignore_file: None,
+                },
+                f"{i}": {
+                    self.data_ignore_file: None,
+                },
+                f"{p}": {
+                    self.data_ignore_file: None,
+                },
+                f"{e}": {
+                    self.data_ignore_file: None,
+                },
             }
         }
 
@@ -522,19 +533,21 @@ class Project:
 
     def data_ls(self) -> DataFrame:
         """View the data filenames in this project."""
+        ignore: list[str] = [self.data_ignore_file]
 
         df = pd.DataFrame()
-        for f in self.data_folder_names:
-            data_folder_path = self.this_project_path / "data" / f
+        for data_folder in self.data_folder_names:
+            data_folder_path = self.this_project_path / "data" / data_folder
 
             # if not data_folder_path.exists():
             #     data_folder_path.mkdir(parents=True, exist_ok=True)
 
             data_files = os.listdir(data_folder_path)
+            data_files = [data_file for data_file in data_files if data_file not in ignore]
 
             df_concat = pd.DataFrame(
                 data_files,
-                columns=[f],
+                columns=[data_folder],
             )
             df = pd.concat([df, df_concat], axis=1)
         return df
