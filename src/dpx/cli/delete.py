@@ -117,8 +117,9 @@ def rm(
 
         if unlocked_projects:
             plural = len(unlocked_projects) > 1
+            print(f"Project{'s' if plural else ''}", end=": ")
             for p in unlocked_projects:
-                print(f"'{p}'", end=", " if plural else " ")
+                print(f"'{p}' in '{project_manager.get_group_from_project(p)}'", end=", " if plural else " ")
             print(f"must be unlocked before {'they are' if plural else 'it is'} deleted.")
 
     if rm_all_temps:
@@ -168,9 +169,18 @@ def grm(
     ],
 ) -> None:
     project_manager = ProjectManager()
-
+    group_path = PROJECTS_DIR / group
     if project_manager.can_delete_group(group):
-        os.rmdir(PROJECTS_DIR / group)
-        print(f"Deleted group: '{group}'.")
+        # os.rmdr removes an empty dir
+        try:
+            os.rmdir(group_path)
+        except OSError:
+            # TODO: check for dirs in group
+            # if dirs dont delete
+            # else delete file
+            os.remove(group_path / ".gitkeep")
+            os.rmdir(group_path)
+        finally:
+            print(f"Deleted group: '{group}'.")
     else:
         print(f"Cannot delete group: '{group}'. Empty first.")

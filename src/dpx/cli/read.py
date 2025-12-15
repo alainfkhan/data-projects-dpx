@@ -55,7 +55,7 @@ def ls(
             "--all",
             help="List projects from all groups.",
         ),
-    ] = True,
+    ] = False,
     temps: Annotated[
         bool,
         typer.Option(

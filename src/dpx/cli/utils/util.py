@@ -102,6 +102,20 @@ class GroupManager:
         is_valid = is_in_base and is_folder and not is_rejected_prefix
         return is_valid
 
+    def is_project(self, filepath: Path) -> bool:
+        """Whether this filepath is a project.
+
+        A filepath is a project iff:
+            in a group
+            a folder
+        """
+
+        is_under_group = self._is_group(filepath.parent)
+        is_folder = filepath.is_dir()
+
+        is_valid = is_under_group and is_folder
+        return is_valid
+
     def _order_groups(self, groups: list[str]) -> list[str]:
         groups.remove("main")
         groups.remove("playground")
@@ -164,8 +178,10 @@ class GroupManager:
         Can delete existing group iff
             is group
             name not reserved
-            contains no projects <= is empty
+            contains no projects
         """
+        group_path = PROJECTS_DIR / group_name
+
         reserved: list[str] = []
         reserved += self.reserved_groups
         reserved += self.reserved_archives
@@ -176,35 +192,22 @@ class GroupManager:
         if group_name in reserved:
             raise ValueError("Action forbidden: cannot delete something reserved.")
 
-        files_in_group = os.listdir(PROJECTS_DIR / group_name)
-        if files_in_group:
-            raise ValueError("Cannot delete a filled group. Must empty first.")
+        files_in_group: list[str] = os.listdir(group_path)
+        for file in files_in_group:
+            if self.is_project(group_path / file):
+                raise ValueError("Cannot delete a group with projects.")
 
         return True
 
     def create_group(self, group_name: str) -> None:
         self.can_create_group(group_name)
-        (self.base_path / group_name).mkdir()
-
-        pass
+        group_path = self.base_path / group_name
+        group_path.mkdir()
+        (group_path / ".gitkeep").touch()
 
 
 class ProjectManager(GroupManager):
     """Manager of projects."""
-
-    def is_project(self, filepath: Path) -> bool:
-        """Whether this filepath is a project.
-
-        A filepath is a project iff:
-            in a group
-            a folder
-        """
-
-        is_under_group = self._is_group(filepath.parent)
-        is_folder = filepath.is_dir()
-
-        is_valid = is_under_group and is_folder
-        return is_valid
 
     def is_temp_project(self, filepath: Path) -> bool:
         """Whether this filepath is a temp project.
@@ -543,6 +546,7 @@ class Project:
             #     data_folder_path.mkdir(parents=True, exist_ok=True)
 
             data_files = os.listdir(data_folder_path)
+            # print(data_files)
             data_files = [data_file for data_file in data_files if data_file not in ignore]
 
             df_concat = pd.DataFrame(

@@ -294,6 +294,9 @@ def mv(
     moved: list[str] = []
     not_moved: list[str] = []
     for name in names:
+        project = Project(project_manager.get_project_path(name))
+        project.lock()
+
         project_manager.verify_project(name)
 
         group = project_manager.get_group_from_project(name)
