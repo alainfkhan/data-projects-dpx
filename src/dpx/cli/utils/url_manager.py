@@ -4,8 +4,6 @@ from pathlib import Path
 from typing import Protocol
 from urllib.parse import urlparse
 
-import kaggle
-
 from icecream import ic
 from requests.exceptions import HTTPError
 from rich import print
@@ -31,6 +29,10 @@ class KaggleHandler:
 
     def download(self, url: str, *, raw_path: Path, external_path: Path) -> Path:
         """"""
+        try:
+            import kaggle
+        except Exception as e:
+            raise e
 
         handle = self.get_handle_from_url(url)
         kaggle.api.authenticate()
