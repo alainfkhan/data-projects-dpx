@@ -46,7 +46,7 @@ from src.dpx.utils.paths import PROJECTS_DIR
 from src.dpx.utils.util import Tree, create_structure
 
 # Custom definitions
-temp_prefix = "~"
+temp_prefix = "tmp_"
 current_main = "main"
 
 copy_appendage = "-copy"

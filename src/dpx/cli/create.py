@@ -14,9 +14,9 @@ import typer
 from icecream import ic
 from rich import print
 
-from src.dpx.cli.utils.util import ProjectManager, Project
+from src.dpx.cli.utils.util import ProjectManager, Project, temp_prefix
 from src.dpx.utils.paths import PROJECTS_DIR
-from src.dpx.utils.util import temp_prefix, copy_attachment, random_string, csv_to_excel
+from src.dpx.utils.util import random_string, csv_to_excel
 
 doptions: list[str] = ["ripe", "metal"]
 # data folder name options

@@ -18,12 +18,7 @@ from rich.table import Table
 from src.dpx.utils.paths import PROJECTS_DIR, PLAYGROUND_DIR
 
 
-"""Configuration variables"""
-
-# temporary file prefix
-temp_prefix = "~"
-
-copy_attachment = "-copy"
+# copy_attachment = "-copy"
 random_string_length = 6
 
 type Tree = dict[str, None | Tree]
@@ -32,7 +27,7 @@ type Tree = dict[str, None | Tree]
 def random_string(length: int = random_string_length) -> str:
     """Generate any random string."""
 
-    characters: str = string.ascii_lowercase + string.digits
+    characters: str = string.ascii_lowercase  # + string.digits
 
     output: str = ""
     for _ in range(length):

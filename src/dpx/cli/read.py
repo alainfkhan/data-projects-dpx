@@ -25,7 +25,7 @@ from rich.table import Table
 
 from src.dpx.cli.utils.util import Project, ProjectManager
 from src.dpx.utils.paths import PROJECTS_DIR
-from src.dpx.utils.util import df_to_table, temp_prefix
+from src.dpx.utils.util import df_to_table
 
 
 ide = "code"
