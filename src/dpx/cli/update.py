@@ -291,35 +291,46 @@ def mv(
     project_manager = ProjectManager()
     project_manager.verify_group(to_group)
 
-    moved: list[str] = []
-    not_moved: list[str] = []
+    moved_projects: list[str] = []
+    same_dst_projects: list[str] = []
+    locked_projects: list[str] = []
     for name in names:
         project = Project(project_manager.get_project_path(name))
-        project.lock()
+        if project.is_locked():
+            locked_projects.append(name)
+            continue
 
         project_manager.verify_project(name)
 
         group = project_manager.get_group_from_project(name)
         if group == to_group:
-            not_moved.append(name)
+            same_dst_projects.append(name)
             continue
+
+        project.lock()
 
         src = PROJECTS_DIR / group / name
         dst = PROJECTS_DIR / to_group / name
         shutil.move(src, dst)
 
-        moved.append(name)
+        moved_projects.append(name)
 
-    if moved:
+    if moved_projects:
         print("Moved projects:", end=" ")
-        for m in moved:
-            print(f"'{m}'", end=", ")
+        for moved_project in moved_projects:
+            print(f"'{moved_project}'", end=", ")
         print(f"to '{to_group}'.")
 
-    if not_moved:
+    if same_dst_projects:
         print("Projects:", end=" ")
-        for n in not_moved:
-            print(f"'{n}'", end=", ")
+        for same_dst_project in same_dst_projects:
+            print(f"'{same_dst_project}'", end=", ")
         print(f"is already in '{to_group}'.")
+
+    if locked_projects:
+        print("Must unlock:", end=" ")
+        for locked_project in locked_projects:
+            print(f"'{locked_project}'", end=", ")
+        print("before moving.")
 
     pass
