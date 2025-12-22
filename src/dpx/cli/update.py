@@ -83,6 +83,7 @@ def lock(
     lock_all: Annotated[
         bool,
         typer.Option(
+            "-a",
             "--all",
             help="Lock all projects in all groups.",
         ),

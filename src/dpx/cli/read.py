@@ -53,6 +53,7 @@ def ls(
     show_all: Annotated[
         bool,
         typer.Option(
+            "-a",
             "--all",
             help="List projects from all groups.",
         ),
@@ -68,6 +69,7 @@ def ls(
     show_all_temps: Annotated[
         bool,
         typer.Option(
+            "-at",
             "--all-temps",
             help="Show temporary projects in all groups. The same as '--all --temps'",
         ),
@@ -134,6 +136,7 @@ def gls(
         bool,
         typer.Option(
             "-a",
+            "--all",
             help="Show hidden project folders.",
         ),
     ] = False,

@@ -50,6 +50,7 @@ def rm(
     search_all: Annotated[
         bool,
         typer.Option(
+            "-a",
             "--all",
             help="Search in all groups.",
         ),
@@ -65,6 +66,7 @@ def rm(
     rm_all_temps: Annotated[
         bool,
         typer.Option(
+            "-at",
             "--all-temps",
             help="Remove all temporary projects in all groups. The same as '--all --temps'",
         ),
