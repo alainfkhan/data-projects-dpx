@@ -157,7 +157,7 @@ def dcp(
     warnings.warn("No files copied.")
 
 
-@app.command(help="Initialise raw files.")
+@app.command(help="Copies and converts all csv files in raw to interim.")
 def dpromote(
     name: Annotated[
         str,

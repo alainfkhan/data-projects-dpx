@@ -25,7 +25,7 @@ dpx init someproject
 ==================================================
 Creates:
     'someproject' project directory: projects/someproject/
-    data directories inside this project directory: proejcts/someproject/data/raw, ...
+    data directories inside this project directory: projects/someproject/data/raw, ...
     someproject.ipynb
     sources.txt
     README.md

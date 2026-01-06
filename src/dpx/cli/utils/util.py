@@ -560,13 +560,19 @@ class Project:
         """Copies all files from raw to interim.
         Force is force overwrite.
 
+        Ignore files .gitkeep
+
         Returns list of succefully created copies.
         """
+        ignore_files: list[str] = [".gitkeep"]
 
         self.data_interim_path.mkdir(parents=True, exist_ok=True)
 
         raw_files = os.listdir(self.data_dump_path)
         # raw_file_paths = [self.data_dump_path / raw_file for raw_file in raw_files]
+
+        # filter out unwanted files
+        raw_files = [f for f in raw_files if f not in ignore_files]
 
         created_copies: list[Path] = []
         for raw_filename in raw_files:

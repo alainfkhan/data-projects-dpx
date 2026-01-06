@@ -22,6 +22,9 @@ class KaggleHandler:
     def get_handle_from_url(self, url: str) -> str:
         parsed_url = urlparse(url)
 
+        if parsed_url.scheme == "":
+            raise ValueError("The URL have a scheme e.g. 'https'.")
+
         path_part = parsed_url.path.removeprefix("/datasets/").split("/")[0:2]
         handle = f"{path_part[0]}/{path_part[1]}"
 

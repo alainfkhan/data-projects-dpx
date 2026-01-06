@@ -32,3 +32,4 @@ dpx begin <project>
 
 dpx find <project>
     Finds the group the project belongs to
+
