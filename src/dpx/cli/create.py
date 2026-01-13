@@ -140,8 +140,12 @@ def dcp(
 
     if playground:
         group = "playground"
+    
 
     project_manager = ProjectManager()
+    group = project_manager.get_group_from_project(name)
+    
+    # TODO: clean redundant verifications
     project_manager.verify_group(group)
     project_manager.verify_project(name)
 
@@ -197,7 +201,11 @@ def dpromote(
     if playground:
         group = "playground"
 
+    
     project_manager = ProjectManager()
+    group = project_manager.get_group_from_project(name)
+
+    # TODO: clean redundant verification
     project_manager.verify_project(name)
     project_manager.verify_group(group)
 
@@ -339,12 +347,12 @@ def init(
         group=group,
     )
 
-    print("Initialising downloaded files...")
-    dpromote(
-        name=name,
-        playground=playground,
-        group=group,
-        force_overwrite=force_overwrite,
-    )
+    # print("Initialising downloaded files...")
+    # dpromote(
+    #     name=name,
+    #     playground=playground,
+    #     group=group,
+    #     force_overwrite=force_overwrite,
+    # )
 
     end_message()

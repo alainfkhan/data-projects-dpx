@@ -566,7 +566,7 @@ class Project:
         """
         ignore_files: list[str] = [".gitkeep"]
 
-        self.data_interim_path.mkdir(parents=True, exist_ok=True)
+        self.data_interim_path.mkdir(exist_ok=True)
 
         raw_files = os.listdir(self.data_dump_path)
         # raw_file_paths = [self.data_dump_path / raw_file for raw_file in raw_files]
