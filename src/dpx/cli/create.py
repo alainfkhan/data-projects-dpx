@@ -140,11 +140,10 @@ def dcp(
 
     if playground:
         group = "playground"
-    
 
     project_manager = ProjectManager()
     group = project_manager.get_group_from_project(name)
-    
+
     # TODO: clean redundant verifications
     project_manager.verify_group(group)
     project_manager.verify_project(name)
@@ -201,7 +200,6 @@ def dpromote(
     if playground:
         group = "playground"
 
-    
     project_manager = ProjectManager()
     group = project_manager.get_group_from_project(name)
 

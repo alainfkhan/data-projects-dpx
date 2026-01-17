@@ -1,0 +1,3 @@
+dpx dl -u <kaggle website> <existing project>
+    kaggle website metadata overwrites existing metadata from earlier downloads 
+    appending new sources in sources.txt needs to be in a new line
