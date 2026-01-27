@@ -21,7 +21,7 @@ dpx init olistbr -u https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce 
 | `dpx`  | CLI tool name | Call the application.                                | -                                                               |
 | `init` | Command       | Initialise a project workspace in an existing group. | `olistbr`                                                     |
 | `-u`   | Flag          | The url source of the dataset.                       | `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce` |
-| `-g`   | Flag          | The name of the group                                | `static`                                                      |
+| `-g`   | Flag          | The name of the group.                               | `static`                                                      |
 
 This generates a project workspace,
 
@@ -118,7 +118,7 @@ olistbr/
 │       └── marketing-funnel-olist.json                    # new metadata saved
 ...
 ├── references/
-│   └── sources.txt                                         # new url appended
+│   └── sources.txt                                        # new url appended
 ...
 ```
 
@@ -153,7 +153,7 @@ dpx dls morse-retail
 ```
 
 ```shell
-                             playground/morse-retail/data/                            
+                             playground/morse-retail/data/                          
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ [2] raw/                  ┃ [0] interim/ ┃ [1] processed/    ┃ [1] external/         ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━┩
