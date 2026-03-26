@@ -1,14 +1,20 @@
-# (DPX) CLI app
+## Navigation 
 
-## DPX: Data Project eXecutor
+- [Analysis Projects](https://github.com/alainfkhan/data-projects-projects)
+- [`DPM`](https://github.com/alainfkhan/data-projects)
+  - [`DPX`](https://github.com/alainfkhan/data-projects-dpx) `<-`
+  - [`DPP`](https://github.com/alainfkhan/data-projects-projects)
+- [Github profile](https://github.com/alainfkhan)
 
-A command line interface application to manage data projects.
+# Data Project Executor (DPX)
+
+Source code for the CLI app.
 
 ## How it works
 
 ### Create a project workspace
 
-Suppose you are scrolling through [kaggle](https://www.kaggle.com/datasets/) and find a dataset you would like to study.
+Suppose you are scrolling through Kaggle and find a dataset you would like to study.
 
 To create a project workspace:
 
@@ -25,9 +31,9 @@ dpx init olistbr -u https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce 
 
 This generates a project workspace,
 
-- named: `olistbr`
-- with a dataset from: `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`
-- in a group: `static`
+- named: `olistbr`,
+- with the dataset from: `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`,
+- in a group: `static`.
 
 `dpx` will generate a new project workspace `olistbr` in `dp-projects/static/`:
 
@@ -66,7 +72,7 @@ olistbr/
 │       └── brazilian-ecommerce.json                    # kaggle dataset metadata
 │
 ├── docs/
-│   ├── assets/                         # images and gifs for README.md
+│   ├── assets/                         # place for images and gifs for README.md
 │   └── notes.txt                       # empty file
 │
 ├── notebooks/
@@ -82,12 +88,12 @@ olistbr/
 ```
 
 > [!CAUTION]
-> From the current configuration of `dpx` the metadata `.json` file generated from the kaggle api will have the default name: `dataset-metadata.json`
-> The user would have to manually change the name to something more fitting to avoid overwriting new metadata downloads.
+> - From the current configuration of `dpx` the metadata `.json` file generated from the kaggle API (`brazilian-ecommerce.json`) will have the default name: `dataset-metadata.json`
+> - The user would have to manually change the name to avoid overwriting new metadata downloads.
 
 ### Download data to an existing project
 
-Suppose then, after a while, you find a supplementary dataset you would like to add on to your current project.
+Suppose after a while you find a supplementary dataset you would like to add on to your current project.
 
 To download a new dataset:
 
@@ -101,7 +107,7 @@ dpx dl olistbr -u https://www.kaggle.com/datasets/olistbr/marketing-funnel-olist
 | `dl`  | Command       | Download a dataset to an existing project. | `olistbr`                                                     |
 | `-u`  | Flag          | The url source of the dataset.              | `https://www.kaggle.com/datasets/olistbr/market-funnel-olist` |
 
-Then, the new dataset `olistbr/market-funnel-olist` is added on to the current project
+Then the new dataset `olistbr/market-funnel-olist` is added onto the current project
 
 ```txt
 olistbr/
@@ -213,22 +219,11 @@ Find the path of the project:
 dpx where retail-dataset
 ```
 
-```shell
-/path/to/main/retail-dataset
-```
-
-Finally:
 Begin working on a project:
 
 ```shell
 dpx begin olistbr
 ```
 
-This opens VScode on that project.
+This opens VScode on the selected project `olistbr` inside the project store.
 
-#### Navigation
-
-- [Analysis projects](https://github.com/alainfkhan/data-projects-projects)
-- [Project overview](https://github.com/alainfkhan/data-projects)
-- [**(DPX) CLI app**](https://github.com/alainfkhan/data-projects-dpx)
-- [Github profile](https://github.com/alainfkhan)
