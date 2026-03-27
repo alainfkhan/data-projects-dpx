@@ -1,4 +1,4 @@
-## Navigation 
+## Navigation
 
 - [Analysis Projects](https://github.com/alainfkhan/data-projects-projects)
 - [`DPM`](https://github.com/alainfkhan/data-projects)
@@ -29,10 +29,10 @@ dpx init olistbr -u https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce 
 | `-u`   | Flag          | The url source of the dataset.                       | `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce` |
 | `-g`   | Flag          | The name of the group.                               | `static`                                                      |
 
-This generates a project workspace,
+This generates a project workspace
 
-- named: `olistbr`,
-- with the dataset from: `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`,
+- named `olistbr`,
+- with the dataset from `https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce`,
 - in a group: `static`.
 
 `dpx` will generate a new project workspace `olistbr` in `dp-projects/static/`:
@@ -88,12 +88,13 @@ olistbr/
 ```
 
 > [!CAUTION]
+>
 > - From the current configuration of `dpx` the metadata `.json` file generated from the kaggle API (`brazilian-ecommerce.json`) will have the default name: `dataset-metadata.json`
 > - The user would have to manually change the name to avoid overwriting new metadata downloads.
 
-### Download data to an existing project
+### Download more data to an existing project
 
-Suppose after a while you find a supplementary dataset you would like to add on to your current project.
+Suppose you find a supplementary dataset you would like to add on to your current project.
 
 To download a new dataset:
 
@@ -107,7 +108,7 @@ dpx dl olistbr -u https://www.kaggle.com/datasets/olistbr/marketing-funnel-olist
 | `dl`  | Command       | Download a dataset to an existing project. | `olistbr`                                                     |
 | `-u`  | Flag          | The url source of the dataset.              | `https://www.kaggle.com/datasets/olistbr/market-funnel-olist` |
 
-Then the new dataset `olistbr/market-funnel-olist` is added onto the current project
+This adds the new dataset `olistbr/market-funnel-olist` onto the current project.
 
 ```txt
 olistbr/
@@ -159,7 +160,7 @@ dpx dls morse-retail
 ```
 
 ```shell
-                             playground/morse-retail/data/                          
+                             playground/morse-retail/data/                        
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ [2] raw/                  ┃ [0] interim/ ┃ [1] processed/    ┃ [1] external/         ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━┩
@@ -168,22 +169,22 @@ dpx dls morse-retail
 └───────────────────────────┴──────────────┴───────────────────┴───────────────────────┘
 ```
 
-Get the sources of a project:
+Get the data sources of a project:
 
 ```shell
 dpx sources morse-retail
 ```
-
-> [!NOTE]
->
-> - `dpx` has a lock feature to discourage moving groups.
-> - A project must first be unlocked before it is moved or deleted.
 
 Check if a project is locked:
 
 ```shell
 dpx islocked morse-retail
 ```
+
+> [!NOTE]
+>
+> - `dpx` has a lock feature to discourage moving groups.
+> - A project must first be unlocked before it is moved or deleted.
 
 Unlock a project:
 
@@ -206,17 +207,17 @@ Rename the project name:
 dpx rename morse-retail retail-dataset
 ```
 
+Find the path of the project:
+
+```shell
+dpx where retail-dataset
+```
+
 Delete a project:
 
 ```shell
 dpx unlock retail-dataset;
 dpx rm retail-dataset
-```
-
-Find the path of the project:
-
-```shell
-dpx where retail-dataset
 ```
 
 Begin working on a project:
@@ -226,4 +227,3 @@ dpx begin olistbr
 ```
 
 This opens VScode on the selected project `olistbr` inside the project store.
-
