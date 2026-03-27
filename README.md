@@ -4,7 +4,7 @@
 - [`DPM`](https://github.com/alainfkhan/data-projects)
   - [`DPX`](https://github.com/alainfkhan/data-projects-dpx) `<-`
   - [`DPP`](https://github.com/alainfkhan/data-projects-projects)
-- [Github profile](https://github.com/alainfkhan)
+- [Github Profile](https://github.com/alainfkhan)
 
 # Data Project Executor (DPX)
 
@@ -108,7 +108,7 @@ dpx dl olistbr -u https://www.kaggle.com/datasets/olistbr/marketing-funnel-olist
 | `dl`  | Command       | Download a dataset to an existing project. | `olistbr`                                                     |
 | `-u`  | Flag          | The url source of the dataset.              | `https://www.kaggle.com/datasets/olistbr/market-funnel-olist` |
 
-This adds the new dataset `olistbr/market-funnel-olist` onto the current project.
+This adds the new dataset onto the current project.
 
 ```txt
 olistbr/
