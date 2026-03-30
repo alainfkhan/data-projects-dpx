@@ -8,7 +8,7 @@
 
 # Data Project Executor (DPX)
 
-Source code for the CLI app.
+Source code for the CLI app to manage data projects.
 
 ## How it works
 
@@ -160,7 +160,7 @@ dpx dls morse-retail
 ```
 
 ```shell
-                             playground/morse-retail/data/                        
+                             playground/morse-retail/data/                      
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ [2] raw/                  ┃ [0] interim/ ┃ [1] processed/    ┃ [1] external/         ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━┩
