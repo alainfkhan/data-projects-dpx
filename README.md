@@ -8,7 +8,9 @@
 
 # Data Project Executor (DPX)
 
-Source code for the CLI app to manage data projects.
+*Source code for the CLI app*
+
+## View help
 
 ## How it works
 
@@ -133,13 +135,53 @@ olistbr/
 
 ### Common commands
 
+View help:
+
+```shell
+dpx --help
+```
+
+```txt
+ Usage: dpx [OPTIONS] COMMAND [ARGS]...
+
+╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ --install-completion          Install completion for the current shell.                                         │
+│ --show-completion             Show completion for the current shell, to copy it or customize the installation.  │
+│ --help                        Show this message and exit.                                                       │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+╭─ Commands ──────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ hello                                                                                                           │
+│ gadd          Create a new group.                                                                               │
+│ dl            Download a dataset to an existing project.                                                        │
+│ dcp           Copies all data in raw to interim in a project.                                                   │
+│ dpromote      Copies and converts all csv files in raw to interim.                                              │
+│ init          Initialise a project workspace in an existing project group.                                      │
+│ ls            List project(s) in group(s).                                                                      │
+│ gls           List groups.                                                                                      │
+│ dls           List data files in a project.                                                                     │
+│ where         Find the project path.                                                                            │
+│ sources       View the sources of a project.                                                                    │
+│ begin         Begin working on the project by opening an IDE.                                                   │
+│ unlock        Unlock project(s).                                                                                │
+│ lock                                                                                                            │
+│ islocked                                                                                                        │
+│ rename        Rename an existing project including all sub files with the same name.                            │
+│ add-sources   Appends sources to the sources.txt                                                                │
+│ mv            Move a file from one group to another group.                                                      │
+│ rm            Delete project(s).                                                                                │
+│ grm                                                                                                             │
+│ dev                                                                                                             │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+```
+
 List all projects in all groups:
 
 ```shell
 dpx ls -a
 ```
 
-```shell
+```txt
 ┏━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━┓
 ┃ [1] main/     ┃ [7] playground/ ┃ [1] macos/ ┃ [2] static/ ┃
 ┡━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━┩
@@ -159,8 +201,8 @@ List all datafiles in a project:
 dpx dls morse-retail
 ```
 
-```shell
-                             playground/morse-retail/data/                      
+```txt
+                             playground/morse-retail/data/                    
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ [2] raw/                  ┃ [0] interim/ ┃ [1] processed/    ┃ [1] external/         ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━┩
