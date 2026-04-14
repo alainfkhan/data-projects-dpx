@@ -1,0 +1,82 @@
+{root}/
+    .dpp/                       # data project identifier
+    data/                       # exclusively data .csv, .xlsx, .db, .json
+        db/                     # exclusively .db
+        internal/               # near data concerning main cause
+            raw/                # data dump
+            interim/            # space for intermediary data in transition
+            cleaned/            # final business-ready data
+            metadata/           # metadata of raw data
+            other/              # space for other data
+            
+        external/               # far data retrieved from elsewhere
+            raw/
+            interim/
+            cleaned/
+            metadata/
+            other/
+
+        pipeline/               # space for moving data
+            raw/
+            interim/
+            cleaned/
+            metadata/
+            other/
+        
+        from-queries/           # data resulted from sql queries
+
+    docs/                       # highest-level documentation of this project
+        archive/                # old scripts to-show go here end in .txt
+        data/                   # explain datasets
+            db/
+                schema.txt
+                erd.txt
+            internal/
+            external/
+            pipeline/
+
+        general/                # note dump
+            general.txt
+        
+        commands.txt            # useful linux commands used
+
+        DEVLOG.md
+        TODO.md
+    
+    logs/                       # system logs from scripts
+        pipeline/
+            internal/
+            external/
+    
+    img/                        # 
+        report/
+
+    refs/
+        data/
+            internal_sources.txt
+            external_sources.txt
+
+        img/
+            report/
+
+    analysis/
+
+    queries/                    # sql queries
+
+    reports/
+        main/
+            CONTEXT.md
+            PREAMBLE.md
+            REPORT.md
+
+    src/                        # python scripts
+        pipeline/               # get data from somewhere eg web to db
+            internal/
+            external/
+
+        main/                   # orchestrate
+            src/
+
+    README.md                   # explain this project
+    LICENSE
+    Makefile
