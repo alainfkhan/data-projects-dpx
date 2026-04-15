@@ -52,3 +52,5 @@ since a project in playground/ is called a project despite not being in project/
 
 Want to move project/ to another base_dir
 For this project, allow data projects to exist inside base_dir
+
+✓
