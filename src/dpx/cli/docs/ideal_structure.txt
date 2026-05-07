@@ -1,30 +1,31 @@
 {root}/
-    .dpp/                           # data project identifier
+    .dpp/                       			# data project identifier/metadata
     backend/
-        data/                       # exclusively data .csv, .xlsx, .db, .json
-            db/                     # exclusively .db
+        .venv/
+        data/                   			# exclusively data .csv, .xlsx, .db, .json (ready for analysis)
+            db/                 			# exclusively .db
+                backups/
+                    {YYYYMMDDTHHmmss}_main.bak
+                    ...
+
                 main.db
 
-            internal/               # near data concerning main cause
-                raw/                # original data dump
-                interim/            # space for intermediary data in transition
-                cleaned/            # final data
-                metadata/           # metadata of raw data
-                other/              # space for other data
-            
-            external/               # far data retrieved from elsewhere
-                ...
+            internal/           			# near data concerning main cause
+                raw/            			# original data dump
+                interim/        			# space for intermediary data in transition
+                cleaned/        			# final data
+                metadata/       			# metadata of raw data
+                other/          			# space for other data
 
-            pipeline/               # (optional) space for moving data
-                ...
-        
-            from-queries/           # data exported from sql queries for global use
-                {query_name}.csv
-                ...
+            external/           			# far data retrieved from elsewhere
+                {...}/          			# same file layout as internal/
 
-        docs/                       # highest-level documentation of backend
-            archive/                # old scripts for showcase, end in .txt, for referencing, temporary
-            data/                   # head datasets for context
+            from-queries/           		# data exported from sql queries for global use
+                {get_data_1}.sql
+
+        docs/                   			# highest-level documentation of backend
+            archive/            			# old scripts for showcase, end in .txt, for referencing, temporary
+            data/               			# head datasets for context
                 db/
                     schema.txt
                     erd.txt
@@ -34,111 +35,133 @@
                     notes.txt
 
                 external/
-                    ...
+                    tables.txt
+                    notes.txt
 
-                pipeline/           # (optional)
-                    ...
-        
-            issues/                 # on pipeline src code
+                pipelines/
+                    {pipeline_1}/
+                        ...
+
+            issues/             			# on pipeline src code
                 issues.txt
 
             suggestions/
                 suggestions.txt
 
-            general/                # note dump
+            general/            			# note dump
                 general.txt
-                commands.txt            # useful linux commands
+                commands.txt    			# useful linux commands
 
-            DEVLOG.md               # dev log
-            JOURNAL.md              # analysis log
-            TODO.md                 # dated daily todo list
-    
-        img/                        # backend images/gifs created
+            DEVLOG.md           			# dev log
+            JOURNAL.md          			# analysis log
+            TODO.md             			# dated daily todo list
+
+        img/                    			# backend images/gifs created
             db/
                 erd.png
 
-        refs/                                   # references source links
+        refs/                       		# references source links
             data/
                 internal_dataset_sources.csv
                 external_dataset_sources.csv
                 pipeline_dataset_sources.csv
 
-            img/                                # images from elsewhere, not created
+            img/                    		# images from elsewhere, not created
                 {ref_img_1}.png
+
+            img_sources.csv         		# image links
+            tools_sources.csv       		# tools used in this project
+
+        analysis/
+            {analysis_1}/
+                queries/
+                data/               		# data exclusive to this analysis
+                general.ipynb
+
+            {analysis_2}/
                 ...
 
-            img_sources.csv                      # image links
-            tools_sources.csv                    # tools used in this project
-        
+            ...
+
         queries/
             globals/
                 functions.sql
                 tables.sql
                 views.sql
-            
-            analysis/
-                ...
 
+            analysis/
+                eda/
+                    scratch/
+            
+            get-data/
+                {get_data_1}.sql
 
             utils/
-                common.sql              # library of useful sql queries
+                common/
+                    common.sql              # library of useful sql queries
 
-        analysis/
-            {analysis-1}/
-                data/                   # data exclusive to this analysis
-                general.ipynb
+                create-dim_date.sql
+                create-dim_time.sql
 
-            {analysis-2}/
-                ...
-            
-            ...
+        src/                                # python scripts (under one .venv, don't make CLI)
+            logs/                           # system logs from scripts
+                backup-db/
 
-        src/                        # python scripts (under one .venv, don't make CLI)
-            logs/                   # system logs from scripts
-                pipeline/
-                    internal/
-                    external/
-                    main/
+                pipelines/
+                    {pipeline_1}/
+                        {pipeline_1}.log
+                    
+                    {pipeline_2}/
+                        {pipeline_2}.log
 
             configs/
-                settings.yml        # config file for __main__.py
+                settings.yml                # config file for main/src/__main__.py
                 pipeline.yml
 
-            pipeline/               # move data to db
-                internal/
-                    src/
-                        ...
+            backup-db/
+                __init__.py
+                src/
+                    ...
 
-                external/
-                    src/
-                        ...
+            pipelines/                      # move data to db
+                {pipeline_1}/
+                    __init__.py
+                    data/
+                        bronze/
+                        silver/
+                        gold/
 
-            main/                   # orchestrator, build db
+                    docs/
+                    src/
+                        __main__.py
+                        pipeline.py
+                        ingest.py
+
+                {pipeline_2}/
+                    ...
+                
+                ...
+
+            main/                           # orchestrator, build db
+                __init__.py
                 src/
                     __main__.py
-                
+
             tests/
                 ...
-            
+
             utils/
                 __init__.py
                 paths.py
-            
-            queries/
-                tests/
-                main/
-                    create-dim_time.sql
-                    create-dim_date.sql
-            
-            Makefile                # makefile for src
-            README.md               # explain src
 
-        README.md                   # explain this project, instructions, links to report
+            Makefile
+            README.md
+
+        README.md               			# explain this project, instructions, links to report
         LICENSE
         Makefile
-    
-    frontend/                       # only for presenting
 
+    frontend/                   			# only for presenting
         report/
             main/
                 CONTEXT.md
@@ -152,8 +175,8 @@
                     ...
                 
                 ...
-            
-            sales/
+
+            sales/  
                 0.1.0/
                     sales.pbip
                     ...

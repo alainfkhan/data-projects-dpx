@@ -10,8 +10,6 @@
 
 *Source code for the CLI app*
 
-## View help
-
 ## How it works
 
 ### Create a project workspace
